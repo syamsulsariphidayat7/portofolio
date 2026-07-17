@@ -76,7 +76,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               <Badge key={tag}>{tag}</Badge>
             ))}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             {project.liveUrl && (
               <a
                 href={project.liveUrl}

@@ -16,8 +16,8 @@ export default function Home() {
 
       <section id="work">
         <AnimatedSection>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-            <div className="text-center mb-16">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 lg:py-24">
+            <div className="text-center mb-12 lg:mb-16">
               <p className="text-primary-600 dark:text-primary-400 font-mono font-medium mb-2 text-sm">
                 {'// karya terpilih'}
               </p>
@@ -43,7 +43,7 @@ export default function Home() {
       </section>
 
       <section id="about">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 border-t border-slate-200 dark:border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 lg:py-24 border-t border-slate-200 dark:border-slate-800">
           <AnimatedSection>
             <p className="text-primary-600 dark:text-primary-400 font-mono font-medium mb-2 text-sm">
               {'// tentang'}
@@ -83,7 +83,7 @@ export default function Home() {
 
       <section id="contact">
         <AnimatedSection>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 border-t border-slate-200 dark:border-slate-800">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 lg:py-24 border-t border-slate-200 dark:border-slate-800">
             <p className="text-primary-600 dark:text-primary-400 font-mono font-medium mb-2 text-sm">
               {'// kontak'}
             </p>
@@ -94,7 +94,7 @@ export default function Home() {
               Ada proyek atau hanya ingin menyapa? Kirim pesan!
             </p>
 
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-12">
               <form
                 action="https://formspree.io/f/yourFormID"
                 method="POST"
