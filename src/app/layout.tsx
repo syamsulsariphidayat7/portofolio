@@ -23,6 +23,10 @@ export const metadata: Metadata = {
     url: "https://sayanaya.my.id",
     siteName: "Anaya",
   },
+  manifest: "/manifest.json",
+  other: {
+    "theme-color": "#0d9488",
+  },
 };
 
 export default function RootLayout({

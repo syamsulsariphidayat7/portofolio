@@ -6,6 +6,7 @@
 - **Animasi:** Framer Motion 12
 - **Theme:** next-themes (dark/light/system)
 - **Package Manager:** pnpm
+- **PWA:** @serwist/next (service worker), manifest route, SVG icon inline
 - **Font:** Inter (next/font/google)
 
 ## Struktur Folder
@@ -16,6 +17,8 @@ src/
 │   ├── layout.tsx           # Root layout (metadata, fonts, wrapper)
 │   ├── page.tsx             # Homepage (Hero + Work + Stats + About + Contact)
 │   ├── not-found.tsx        # Custom 404 page
+│   ├── icon.svg             # PWA icon inline (teal + "A")
+│   ├── manifest.ts          # PWA manifest JSON
 │   └── projects/
 │       └── page.tsx         # /projects — semua proyek
 ├── components/
@@ -105,7 +108,8 @@ Ada 6 proyek. Untuk gambar sementara pakai placeholder `/project-1.jpg` s/d `/pr
 - `AboutCode.tsx` sudah ada tapi tidak dipakai di page.tsx (alternatif tentang saya)
 - Image proyek gambar placeholder — perlu diganti gambar asli
 - Social links masih pakai placeholder `username` — ganti dengan akun asli user
-- Build command: `pnpm build`
+- Build command: `pnpm build` (pakai `--webpack` karena serwist belum support Turbopack)
 - Dev command: `pnpm dev`
+- PWA: service worker digenerate otomatis ke `public/sw.js` saat build, register via serwist
 - Cluster nyala di production pakai `pm2` (cek isi `/srv/http/portfolio` untuk konfigurasi)
 - Portofolio ini bilingual Indonesia
