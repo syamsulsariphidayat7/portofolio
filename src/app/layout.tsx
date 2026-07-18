@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { BackToTop } from "@/components/BackToTop";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -45,6 +46,7 @@ export default function RootLayout({
           <Footer />
         </Providers>
         <BackToTop />
+        <InstallPrompt />
       </body>
     </html>
   );

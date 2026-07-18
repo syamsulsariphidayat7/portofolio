@@ -23,6 +23,7 @@
 - Back to Top button
 - Scroll progress bar
 - Stat counter animasi
+- Install PWA prompt
 - PWA (manifest + service worker)
 
 ## Struktur Folder
