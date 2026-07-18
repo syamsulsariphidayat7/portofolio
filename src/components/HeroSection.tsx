@@ -23,21 +23,18 @@ export function HeroSection() {
           >
             $ {personal.role}
           </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-4"
-          >
-            Hai, saya{" "}
-            <span className="bg-gradient-to-r from-primary-600 to-teal-500 dark:from-primary-400 dark:to-teal-300 bg-clip-text text-transparent">
-              {personal.name}
-            </span>
-          </motion.h1>
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-4">
+            <TypingEffect
+              text={`Hai, saya ${personal.name}`}
+              speed={100}
+              delay={300}
+              className="bg-gradient-to-r from-primary-600 to-teal-500 dark:from-primary-400 dark:to-teal-300 bg-clip-text text-transparent"
+            />
+          </h1>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
+            transition={{ delay: 2.5, duration: 0.6 }}
             className="h-10 mb-8"
           >
             <p className="text-lg sm:text-xl text-slate-500 dark:text-slate-400 font-mono">
@@ -48,7 +45,7 @@ export function HeroSection() {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.5, duration: 0.6 }}
+            transition={{ delay: 3, duration: 0.6 }}
             className="text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             {personal.bio}
@@ -56,7 +53,7 @@ export function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.7, duration: 0.6 }}
+            transition={{ delay: 3.2, duration: 0.6 }}
             className="flex items-center justify-center gap-4 flex-wrap"
           >
             <Button href="#work">Lihat Proyek</Button>

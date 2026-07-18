@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRef, useCallback } from "react";
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -15,6 +18,23 @@ export function Button({
   className = "",
   ...props
 }: ButtonProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    el.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.transform = "translate(0, 0)";
+  }, []);
+
   const base =
     "inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200";
 
@@ -29,16 +49,21 @@ export function Button({
 
   const classes = `${base} ${variants[variant]} ${className}`;
 
+  const handlers = {
+    onMouseMove: handleMouseMove,
+    onMouseLeave: handleMouseLeave,
+  };
+
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} ref={ref as React.Ref<HTMLAnchorElement>} {...handlers}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button className={classes} {...props}>
+    <button className={classes} ref={ref as React.Ref<HTMLButtonElement>} {...handlers} {...props}>
       {children}
     </button>
   );
