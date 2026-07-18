@@ -3,6 +3,7 @@ import { AnimatedSection } from "@/components/AnimatedSection";
 import { ProjectCard } from "@/components/ProjectCard";
 import { SkillBar } from "@/components/SkillBar";
 import { Timeline } from "@/components/Timeline";
+import { StatCounter } from "@/components/StatCounter";
 import { Button } from "@/components/ui/Button";
 import { projects } from "@/content/projects";
 import { personal } from "@/content/personal";
@@ -40,6 +41,14 @@ export default function Home() {
             </div>
           </div>
         </AnimatedSection>
+      </section>
+
+      <section className="border-t border-slate-200 dark:border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 lg:py-24">
+          <AnimatedSection>
+            <StatCounter items={personal.stats} />
+          </AnimatedSection>
+        </div>
       </section>
 
       <section id="about">

@@ -9,6 +9,12 @@ export const personal = {
   domain: "sayanaya.my.id",
   avatar: "/avatar.jpg",
   resumeUrl: "/resume.pdf",
+  stats: [
+    { label: "Proyek Selesai", value: 10 },
+    { label: "Tahun Pengalaman", value: 3 },
+    { label: "Teknologi Dikuasai", value: 16 },
+    { label: "Klien Puas", value: 8 },
+  ],
   social: {
     github: "https://github.com/username",
     linkedin: "https://linkedin.com/in/username",

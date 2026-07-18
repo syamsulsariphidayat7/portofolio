@@ -4,6 +4,8 @@ import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { BackToTop } from "@/components/BackToTop";
+import { ScrollProgress } from "@/components/ScrollProgress";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -31,12 +33,14 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans`}>
+        <ScrollProgress />
         <LoadingScreen />
         <Providers>
           <Navbar />
           <main className="min-h-screen pb-20 md:pb-0">{children}</main>
           <Footer />
         </Providers>
+        <BackToTop />
       </body>
     </html>
   );
