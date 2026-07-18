@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { personal } from "@/content/personal";
 
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
@@ -57,7 +58,7 @@ export function InstallPrompt() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                Install Aplikasi Anaya
+                Install Aplikasi {personal.brand}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                 Akses cepat dari layar utama

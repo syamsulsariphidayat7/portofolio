@@ -34,7 +34,7 @@ src/
 │   ├── layout.tsx           # Root layout (metadata, fonts, wrapper)
 │   ├── page.tsx             # Homepage (Hero + Work + Stats + About + Contact)
 │   ├── not-found.tsx        # Custom 404 page
-│   ├── icon.svg             # PWA icon inline (teal + "A")
+│   ├── icon.svg             # PWA icon inline (teal + "S")
 │   ├── manifest.ts          # PWA manifest JSON
 │   └── projects/
 │       └── page.tsx         # /projects — semua proyek
@@ -53,10 +53,12 @@ src/
 │   ├── LoadingScreen.tsx    # Loader animasi di awal
 │   ├── TypingEffect.tsx     # Efek ketik otomatis
 │   ├── AboutCode.tsx        # Alternatif section "tentang" (tidak dipakai)
-│   ├── Footer.tsx           # Footer dengan credit
+│   ├── Footer.tsx           # Footer dengan credit + visitor counter
 │   ├── BackToTop.tsx        # Floating button kembali ke atas
 │   ├── ScrollProgress.tsx   # Progress bar horizontal di atas
-│   └── StatCounter.tsx      # Animated stat counter (props: items[])
+│   ├── StatCounter.tsx      # Animated stat counter (props: items[])
+│   ├── InstallPrompt.tsx    # Prompt install PWA
+│   └── VisitorCounter.tsx   # Visitor counter via countapi.xyz
 └── content/
     ├── personal.ts          # Data personal, skills, timeline, social, stats
     └── projects.ts          # Data proyek + interface Project
