@@ -6,8 +6,24 @@
 - **Animasi:** Framer Motion 12
 - **Theme:** next-themes (dark/light/system)
 - **Package Manager:** pnpm
-- **PWA:** @serwist/next (service worker), manifest route, SVG icon inline
+- **PWA:** @serwist/next
+- **Deploy:** GitHub → Vercel + Cloudflare
 - **Font:** Inter (next/font/google)
+
+## Fitur
+- Hero dengan typing effect
+- Projects grid + 3D tilt card
+- About (skill bar animasi, timeline)
+- Contact form (Formspree)
+- Dark/light theme toggle
+- Navbar sticky + bottom nav mobile
+- Loading screen
+- Smooth scroll
+- Custom 404 page
+- Back to Top button
+- Scroll progress bar
+- Stat counter animasi
+- PWA (manifest + service worker)
 
 ## Struktur Folder
 ```
@@ -103,13 +119,11 @@ Ada 6 proyek. Untuk gambar sementara pakai placeholder `/project-1.jpg` s/d `/pr
 - **Dark mode:** class strategy (Tailwind `dark:` prefix), diatur next-themes
 
 ## Catatan Penting
-- Form contact pake Formspree — ID masih placeholder (`yourFormID`), ganti dengan endpoint nyata
-- Domain: `sayanaya.my.id`
-- `AboutCode.tsx` sudah ada tapi tidak dipakai di page.tsx (alternatif tentang saya)
-- Image proyek gambar placeholder — perlu diganti gambar asli
-- Social links masih pakai placeholder `username` — ganti dengan akun asli user
-- Build command: `pnpm build` (pakai `--webpack` karena serwist belum support Turbopack)
-- Dev command: `pnpm dev`
-- PWA: service worker digenerate otomatis ke `public/sw.js` saat build, register via serwist
-- Cluster nyala di production pakai `pm2` (cek isi `/srv/http/portfolio` untuk konfigurasi)
-- Portofolio ini bilingual Indonesia
+- Build: `pnpm build` — Dev: `pnpm dev`
+- Agent hanya commit lokal, push manual user
+- Deploy: local → GitHub → Vercel + Cloudflare
+- Formspree ID masih placeholder (`yourFormID`)
+- Social links masih placeholder `username`
+- `AboutCode.tsx` tidak dipakai
+- Image proyek masih placeholder `project-1.jpg` s/d `-6.jpg`
+- Portofolio bilingual Indonesia
