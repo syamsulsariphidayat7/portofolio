@@ -1,12 +1,16 @@
 import { personal } from "@/content/personal";
+import { VisitorCounter } from "./VisitorCounter";
 
 export function Footer() {
   return (
     <footer className="border-t border-slate-200 dark:border-slate-800">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          &copy; {new Date().getFullYear()} {personal.name}. Hak cipta dilindungi.
-        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            &copy; {new Date().getFullYear()} {personal.name}. Hak cipta dilindungi.
+          </p>
+          <VisitorCounter />
+        </div>
         <div className="flex items-center gap-4">
           <a
             href={personal.social.github}

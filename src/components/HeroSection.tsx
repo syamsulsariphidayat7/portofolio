@@ -42,7 +42,7 @@ export function HeroSection() {
           >
             <p className="text-lg sm:text-xl text-slate-500 dark:text-slate-400 font-mono">
               <span className="text-primary-400">&gt; </span>
-              <TypingEffect text="say anaya..." speed={80} delay={300} />
+              <TypingEffect text="say syamsul..." speed={80} delay={300} />
             </p>
           </motion.div>
           <motion.p

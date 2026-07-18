@@ -74,13 +74,13 @@ Semua data statis dari TypeScript (`src/content/`). Tidak ada CMS, database, ata
 ### `src/content/personal.ts`
 ```ts
 export const personal = {
-  name: "Anaya",
-  brand: "Anaya",
+  name: "Syamsul",
+  brand: "Syamsul",
   role: "Pengembang Full-Stack",
   email: "syamsulsariphidayat@gmail.com",
   phone: "082120256228",
   location: "Indonesia",
-  domain: "sayanaya.my.id",
+  domain: "boundless.my.id",
   bio: "Saya membangun aplikasi web modern...",
   avatar: "/avatar.jpg",
   resumeUrl: "/resume.pdf",

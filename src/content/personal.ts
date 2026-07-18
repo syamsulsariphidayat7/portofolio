@@ -1,12 +1,12 @@
 export const personal = {
-  name: "Anaya",
-  brand: "Anaya",
+  name: "Syamsul",
+  brand: "Syamsul",
   role: "Pengembang Full-Stack",
   email: "syamsulsariphidayat@gmail.com",
   phone: "082120256228",
   location: "Indonesia",
   bio: "Saya membangun aplikasi web modern dengan teknologi terkini. Berpengalaman menciptakan solusi digital yang elegan, cepat, dan ramah pengguna.",
-  domain: "sayanaya.my.id",
+  domain: "boundless.my.id",
   avatar: "/avatar.jpg",
   resumeUrl: "/resume.pdf",
   stats: [

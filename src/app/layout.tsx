@@ -12,17 +12,17 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Anaya — Portofolio",
-  description: "Portofolio pribadi",
-  metadataBase: new URL("https://sayanaya.my.id"),
+  title: "Syamsul — Portofolio",
+  description: "Portofolio pribadi Syamsul, Pengembang Full-Stack",
+  metadataBase: new URL("https://boundless.my.id"),
   icons: {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Anaya — Portofolio",
-    description: "Portofolio pribadi",
-    url: "https://sayanaya.my.id",
-    siteName: "Anaya",
+    title: "Syamsul — Portofolio",
+    description: "Portofolio pribadi Syamsul, Pengembang Full-Stack",
+    url: "https://boundless.my.id",
+    siteName: "Syamsul",
   },
   manifest: "/manifest.json",
   other: {
