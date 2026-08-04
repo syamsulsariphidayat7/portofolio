@@ -47,22 +47,15 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         }}
         className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/5 dark:hover:shadow-primary-500/10"
       >
-        <div className="aspect-video bg-gradient-to-br from-primary-100 to-teal-50 dark:from-primary-950 dark:to-slate-900 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-2xl bg-primary-200 dark:bg-primary-800/50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <svg
-              className="w-8 h-8 text-primary-600 dark:text-primary-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
-              />
-            </svg>
-          </div>
+        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary-100 to-teal-50 dark:from-primary-950 dark:to-slate-900">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={project.image}
+            alt={project.title}
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         </div>
         <div className="p-6">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">

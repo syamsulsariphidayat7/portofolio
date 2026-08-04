@@ -14,7 +14,7 @@
 - Hero dengan typing effect
 - Projects grid + 3D tilt card
 - About (skill bar animasi, timeline)
-- Contact form (Formspree)
+- Contact (mailto: langsung ke klien email)
 - Dark/light theme toggle
 - Navbar sticky + bottom nav mobile
 - Loading screen
@@ -59,9 +59,11 @@ src/
 │   ├── StatCounter.tsx      # Animated stat counter (props: items[])
 │   ├── InstallPrompt.tsx    # Prompt install PWA
 │   └── VisitorCounter.tsx   # Visitor counter via countapi.xyz
-└── content/
-    ├── personal.ts          # Data personal, skills, timeline, social, stats
-    └── projects.ts          # Data proyek + interface Project
+├── content/
+│   ├── personal.ts          # Data personal, skills, timeline, social, stats
+│   └── projects.ts          # Data proyek + interface Project
+└── scripts/
+    └── generate-assets.sh   # Generate aset placeholder (icon, avatar, resume, gambar proyek)
 ```
 
 ## Halaman & Routing
@@ -125,8 +127,9 @@ Ada 6 proyek. Untuk gambar sementara pakai placeholder `/project-1.jpg` s/d `/pr
 - Build: `pnpm build` — Dev: `pnpm dev`
 - Agent hanya commit lokal, push manual user
 - Deploy: local → GitHub → Vercel + Cloudflare
-- Formspree ID masih placeholder (`yourFormID`)
-- Social links masih placeholder `username`
+- Kontak memakai `mailto:` (tidak pakai Formspree)
+- Sosial media: handle `syamsulsariphidayat7`
 - `AboutCode.tsx` tidak dipakai
-- Image proyek masih placeholder `project-1.jpg` s/d `-6.jpg`
+- Aset placeholder tersedia di `public/` (icon.svg, favicon.ico, avatar.jpg, resume.pdf, project-1..6.jpg). Regenerasi: `bash scripts/generate-assets.sh`
+- Status terkini ada di `PROGRESS.md`
 - Portofolio bilingual Indonesia

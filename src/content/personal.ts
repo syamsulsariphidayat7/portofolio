@@ -16,10 +16,10 @@ export const personal = {
     { label: "Klien Puas", value: 8 },
   ],
   social: {
-    github: "https://github.com/username",
-    linkedin: "https://linkedin.com/in/username",
-    twitter: "https://twitter.com/username",
-    instagram: "https://instagram.com/username",
+    github: "https://github.com/syamsulsariphidayat7",
+    linkedin: "https://linkedin.com/in/syamsulsariphidayat7",
+    twitter: "https://twitter.com/syamsulsariphidayat7",
+    instagram: "https://instagram.com/syamsulsariphidayat7",
   },
   skills: [
     { name: "React / Next.js", level: 95 },
