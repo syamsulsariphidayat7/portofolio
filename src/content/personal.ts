@@ -2,6 +2,12 @@ export const personal = {
   name: "Syamsul",
   brand: "Syamsul",
   role: "Pengembang Full-Stack",
+  roles: [
+    "Pengembang Full-Stack",
+    "Frontend Engineer",
+    "Backend Developer",
+    "UI/UX Enthusiast",
+  ],
   email: "syamsulsariphidayat@gmail.com",
   phone: "082120256228",
   location: "Indonesia",

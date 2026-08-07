@@ -8,6 +8,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { NetworkBackground } from "@/components/NetworkBackground";
+import { CursorGlow } from "@/components/CursorGlow";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -42,9 +43,10 @@ export default function RootLayout({
         <NetworkBackground />
         <ScrollProgress />
         <LoadingScreen />
+        <CursorGlow />
         <Providers>
           <Navbar />
-          <main className="min-h-screen pb-20 md:pb-0">{children}</main>
+          <main className="relative z-10 min-h-screen pb-20 md:pb-0">{children}</main>
           <Footer />
         </Providers>
         <BackToTop />
