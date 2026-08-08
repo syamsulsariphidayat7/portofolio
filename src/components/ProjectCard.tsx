@@ -1,7 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useScroll,
+  useTransform,
+  useMotionTemplate,
+  useReducedMotion,
+} from "framer-motion";
 import { Badge } from "./ui/Badge";
 import type { Project } from "@/content/projects";
 
@@ -12,21 +20,43 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, index }: ProjectCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
+  const reduce = useReducedMotion();
 
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    setRotateX((y - rect.height / 2) / 28);
-    setRotateY((rect.width / 2 - x) / 28);
+  /* ---- Tilt 3D halus (spring) ---- */
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 180, damping: 20, mass: 0.6 });
+  const sry = useSpring(ry, { stiffness: 180, damping: 20, mass: 0.6 });
+
+  /* ---- Glare spotlight mengikuti kursor ---- */
+  const gx = useMotionValue(50);
+  const gy = useMotionValue(50);
+  const glare = useMotionTemplate`radial-gradient(460px circle at ${gx}% ${gy}%, rgba(255,255,255,0.09), transparent 60%)`;
+
+  /* ---- Parallax gambar di dalam bingkai saat scroll ---- */
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"],
+  });
+  const imgY = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
+
+  function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const el = cardRef.current;
+    if (!el || reduce) return;
+    const rect = el.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    ry.set((px - 0.5) * 14);
+    rx.set((0.5 - py) * 14);
+    gx.set(px * 100);
+    gy.set(py * 100);
   }
 
-  function handleMouseLeave() {
-    setRotateX(0);
-    setRotateY(0);
+  function onMouseLeave() {
+    rx.set(0);
+    ry.set(0);
+    gx.set(50);
+    gy.set(50);
   }
 
   return (
@@ -37,25 +67,35 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       className="h-full"
     >
-      <div
+      <motion.div
         ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{ transform: `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)` }}
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-primary-500/40 hover:shadow-2xl hover:shadow-primary-500/10 dark:border-slate-800 dark:bg-slate-900"
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        style={{ rotateX: srx, rotateY: sry, transformPerspective: 1000 }}
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-primary-500/50 hover:shadow-[0_0_36px_rgba(20,184,166,0.18)] dark:border-slate-800 dark:bg-slate-900"
       >
-        {/* Gambar */}
+        {/* Garis neon atas saat hover */}
+        <div className="absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-primary-500/80 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        {/* Sudut HUD */}
+        <span aria-hidden="true" className="absolute left-2.5 top-2.5 z-10 h-3 w-3 border-l-2 border-t-2 border-primary-400/60" />
+        <span aria-hidden="true" className="absolute right-2.5 top-2.5 z-10 h-3 w-3 border-r-2 border-t-2 border-primary-400/60" />
+        {/* Gambar dengan parallax internal */}
         <div className="relative aspect-video shrink-0 overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={project.image}
-            alt={project.title}
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
+          <div className="absolute inset-x-0 -inset-y-[14%] will-change-transform">
+            <motion.div style={{ y: reduce ? 0 : imgY }} className="h-full w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={project.image}
+                alt={project.title}
+                loading="lazy"
+                className="h-full w-full scale-110 object-cover transition-transform duration-700 group-hover:scale-[1.18]"
+              />
+            </motion.div>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-          <span className="absolute left-3 top-3 rounded-md border border-white/10 bg-slate-950/50 px-2 py-1 font-mono text-[11px] font-medium text-slate-200 backdrop-blur-sm">
-            {String(index + 1).padStart(2, "0")}
+          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border border-primary-400/30 bg-slate-950/60 px-2 py-1 font-mono text-[10px] font-medium tracking-wider text-primary-300 backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
+            PRJ-{String(index + 1).padStart(2, "0")}
           </span>
           {/* Kilau saat hover */}
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-1000 group-hover:translate-x-full" />
@@ -91,7 +131,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         </div>
 
         {/* Konten */}
-        <div className="flex flex-1 flex-col p-6">
+        <div className="relative flex flex-1 flex-col p-6">
           <h3 className="text-lg font-semibold text-slate-900 transition-colors group-hover:text-primary-600 dark:text-slate-100 dark:group-hover:text-primary-400">
             {project.title}
           </h3>
@@ -134,7 +174,14 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             </span>
           </div>
         </div>
-      </div>
+
+        {/* Glare spotlight */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ background: glare }}
+        />
+      </motion.div>
     </motion.div>
   );
 }

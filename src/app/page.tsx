@@ -6,6 +6,10 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { SkillBar } from "@/components/SkillBar";
 import { Timeline } from "@/components/Timeline";
 import { StatCounter } from "@/components/StatCounter";
+import { Parallax } from "@/components/Parallax";
+import { TiltCard } from "@/components/TiltCard";
+import { HudFrame } from "@/components/HudFrame";
+import { RevealText } from "@/components/RevealText";
 import { Button } from "@/components/ui/Button";
 import { SocialLinks } from "@/components/SocialLinks";
 import { projects } from "@/content/projects";
@@ -13,13 +17,18 @@ import { personal } from "@/content/personal";
 
 const marqueeItems = [
   "Next.js",
+  "0x1F6A",
   "React",
+  "0xA5",
   "TypeScript",
+  "0x7E4C",
   "Node.js",
   "Tailwind CSS",
+  "0x3F2B",
   "PostgreSQL",
   "Prisma",
   "GraphQL",
+  "0xB9",
   "Docker",
   "Laravel",
   "Livewire",
@@ -161,7 +170,9 @@ export default function Home() {
       <Marquee items={marqueeItems} />
 
       {/* ===== KARYA ===== */}
-      <section id="work" className="relative">
+      <section id="work" className="relative overflow-hidden">
+        <Parallax speed={110} className="pointer-events-none absolute -right-28 top-20 h-80 w-80 rounded-full bg-primary-500/10 blur-3xl" />
+        <Parallax speed={-70} className="pointer-events-none absolute -left-28 bottom-32 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
           <AnimatedSection>
             <SectionHeading
@@ -191,7 +202,9 @@ export default function Home() {
       </section>
 
       {/* ===== LAYANAN ===== */}
-      <section className="border-t border-slate-200 dark:border-slate-800">
+      <section className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
+        <Parallax speed={80} className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
+        <Parallax speed={-100} className="pointer-events-none absolute -right-24 bottom-10 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
           <AnimatedSection>
             <SectionHeading
@@ -207,9 +220,12 @@ export default function Home() {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {services.map((service, i) => (
               <AnimatedSection key={service.title} delay={i * 0.08} className="h-full">
-                <div className="group relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/70 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-500/40 hover:shadow-xl hover:shadow-primary-500/10 dark:border-slate-800 dark:bg-slate-900/50">
+                <TiltCard
+                  intensity={6}
+                  className="group h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/70 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary-500/40 hover:shadow-xl hover:shadow-primary-500/10 dark:border-slate-800 dark:bg-slate-900/50"
+                >
                   <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-primary-500/10 opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100" />
-                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-teal-500 text-white shadow-lg shadow-primary-500/25 transition-transform duration-300 group-hover:rotate-3 group-hover:scale-110">
+                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-teal-500 text-white shadow-[0_0_24px_rgba(20,184,166,0.35)] transition-transform duration-300 group-hover:rotate-3 group-hover:scale-110">
                     {service.icon}
                   </div>
                   <h3 className="mt-5 text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -228,7 +244,7 @@ export default function Home() {
                       </span>
                     ))}
                   </div>
-                </div>
+                </TiltCard>
               </AnimatedSection>
             ))}
           </div>
@@ -236,7 +252,8 @@ export default function Home() {
       </section>
 
       {/* ===== TENTANG ===== */}
-      <section id="about" className="border-t border-slate-200 dark:border-slate-800">
+      <section id="about" className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
+        <Parallax speed={-90} className="pointer-events-none absolute -right-32 top-24 h-80 w-80 rounded-full bg-primary-500/10 blur-3xl" />
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
           <AnimatedSection>
             <SectionHeading
@@ -279,16 +296,28 @@ export default function Home() {
       </section>
 
       {/* ===== STATISTIK ===== */}
-      <section className="border-y border-slate-200 bg-gradient-to-r from-primary-500/5 via-transparent to-teal-500/5 dark:border-slate-800">
+      <section className="relative overflow-hidden border-y border-slate-200 bg-gradient-to-r from-primary-500/5 via-transparent to-teal-500/5 dark:border-slate-800">
+        <div aria-hidden="true" className="cyber-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
+        <div
+          aria-hidden="true"
+          className="animate-spin-slow pointer-events-none absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-primary-500/15"
+        />
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <AnimatedSection>
+            <p className="mb-8 text-center font-mono text-[11px] tracking-[0.3em] text-slate-400">
+              <span className="text-primary-500">[</span> SYSTEM.DATA{" "}
+              <span className="text-primary-500">//</span> REAL-TIME{" "}
+              <span className="text-primary-500">]</span>
+            </p>
             <StatCounter items={personal.stats} />
           </AnimatedSection>
         </div>
       </section>
 
       {/* ===== KONTAK ===== */}
-      <section id="contact" className="border-b border-slate-200 dark:border-slate-800">
+      <section id="contact" className="relative overflow-hidden border-b border-slate-200 dark:border-slate-800">
+        <Parallax speed={100} className="pointer-events-none absolute -left-28 top-32 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+        <Parallax speed={-60} className="pointer-events-none absolute -right-28 bottom-40 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
           <AnimatedSection>
             <SectionHeading
@@ -305,13 +334,19 @@ export default function Home() {
           <div className="mt-14 grid gap-8 lg:grid-cols-5">
             {/* CTA besar */}
             <AnimatedSection className="lg:col-span-3">
-              <div className="relative h-full overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-teal-600 to-primary-700 p-8 text-white shadow-2xl shadow-primary-500/25 sm:p-12 dark:from-primary-500 dark:via-teal-500 dark:to-primary-600">
-                <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
-                <div className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-slate-950/20 blur-3xl" />
-                <p className="font-mono text-sm text-primary-100">$ contact --priority</p>
-                <h3 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
-                  Punya ide menarik? Mari wujudkan bersama.
-                </h3>
+              <TiltCard intensity={4} glare={false} className="h-full">
+                <HudFrame label="TRANSMISSION // SECURE" cornerClassName="border-primary-100/70" className="h-full">
+                  <div className="relative h-full overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 via-teal-600 to-primary-700 p-8 text-white shadow-2xl shadow-primary-500/25 sm:p-12 dark:from-primary-500 dark:via-teal-500 dark:to-primary-600">
+                    <div aria-hidden="true" className="circuit pointer-events-none absolute inset-0 opacity-60" />
+                    <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white/10 blur-2xl" />
+                    <div className="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-slate-950/20 blur-3xl" />
+                    <p className="font-mono text-sm text-primary-100">
+                      &gt; contact --initiate --secure
+                      <span className="animate-blink text-white">▌</span>
+                    </p>
+                  <h3 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
+                    <RevealText text="Punya ide menarik? Mari wujudkan bersama." />
+                  </h3>
                 <p className="mt-4 max-w-md leading-relaxed text-primary-50/90">
                   Jangan ragu untuk menyapa — saya biasanya membalas dalam 1x24 jam. Setiap proyek
                   dimulai dari percakapan sederhana.
@@ -341,8 +376,10 @@ export default function Home() {
                     </svg>
                     WhatsApp
                   </Button>
+                  </div>
                 </div>
-              </div>
+              </HudFrame>
+              </TiltCard>
             </AnimatedSection>
 
             {/* Info kontak */}

@@ -9,6 +9,10 @@ import { ScrollProgress } from "@/components/ScrollProgress";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { NetworkBackground } from "@/components/NetworkBackground";
 import { CursorGlow } from "@/components/CursorGlow";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import { Scanlines } from "@/components/Scanlines";
+import { Telemetry } from "@/components/Telemetry";
+import { TerminalOverlay } from "@/components/TerminalOverlay";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -41,15 +45,20 @@ export default function RootLayout({
     <html lang="id" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans`}>
         <NetworkBackground />
+        <SmoothScroll />
         <ScrollProgress />
         <LoadingScreen />
         <CursorGlow />
+        <Scanlines />
+        <div aria-hidden="true" className="noise pointer-events-none fixed inset-0 z-[15] opacity-[0.035]" />
         <Providers>
           <Navbar />
           <main className="relative z-10 min-h-screen pb-20 md:pb-0">{children}</main>
           <Footer />
         </Providers>
         <BackToTop />
+        <Telemetry />
+        <TerminalOverlay />
         <InstallPrompt />
       </body>
     </html>

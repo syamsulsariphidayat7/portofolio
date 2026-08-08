@@ -5,8 +5,9 @@ import { SocialLinks } from "./SocialLinks";
 
 export function Footer() {
   return (
-    <footer className="relative z-10 border-t border-slate-200 dark:border-slate-800">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/60 to-transparent" />
+    <footer className="relative z-10 overflow-hidden border-t border-slate-200 dark:border-slate-800">
+      <div aria-hidden="true" className="circuit absolute inset-x-0 top-0 h-10 opacity-70 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/70 to-transparent" />
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 md:grid-cols-3">
           <div>
@@ -88,8 +89,9 @@ export function Footer() {
           <p className="text-xs text-slate-500 dark:text-slate-400">
             &copy; {new Date().getFullYear()} {personal.name}. Hak cipta dilindungi.
           </p>
-          <p className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-            Dibuat dengan <span className="text-primary-500">♥</span> menggunakan Next.js
+          <p className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+            SYS.CORE v2.1 — ONLINE
           </p>
           <VisitorCounter />
         </div>

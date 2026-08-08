@@ -22,8 +22,10 @@ interface CodeSymbol {
 }
 
 const PARTICLE_COUNT = 50;
-const CONNECTION_DIST = 150;
+const CONNECTION_DIST = 125;
 const SYMBOLS = ["</>", "{}", "()", "[]", "=>", "/*", "//", "const", "let", "fn"];
+const MOUSE_DIST = 170;
+const MAX_SPEED = 1.6;
 
 export function NetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -48,8 +50,8 @@ export function NetworkBackground() {
       () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 1.4,
-        vy: (Math.random() - 0.5) * 1.4,
+        vx: (Math.random() - 0.5) * 0.55,
+        vy: (Math.random() - 0.5) * 0.55,
         size: Math.random() * 2 + 1.5,
         alpha: Math.random() * 0.5 + 0.3,
       }),
@@ -62,29 +64,44 @@ export function NetworkBackground() {
         y: Math.random() * canvas.height,
         text: SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)],
         size: Math.random() * 6 + 10,
-        vx: (Math.random() - 0.5) * 0.55,
-        vy: (Math.random() - 0.5) * 0.55 - 0.25,
+        vx: (Math.random() - 0.5) * 0.26,
+        vy: (Math.random() - 0.5) * 0.26 - 0.12,
         opacity: Math.random() * 0.12 + 0.04,
       }),
     );
+
+    /* ---- Interaksi kursor (desktop) ---- */
+    let mouseX = -9999;
+    let mouseY = -9999;
+    const isCoarse = window.matchMedia("(pointer: coarse)").matches;
+    const onMove = (e: MouseEvent) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+    const onLeave = () => {
+      mouseX = -9999;
+      mouseY = -9999;
+    };
+    if (!isCoarse) {
+      window.addEventListener("mousemove", onMove, { passive: true });
+      window.addEventListener("mouseout", onLeave);
+    }
 
     let animId: number;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const isDark = document.documentElement.classList.contains("dark");
-      const lineColor = isDark
-        ? "rgba(45, 212, 191,"
-        : "rgba(13, 148, 136,";
-      const nodeColor = isDark
-        ? "rgba(45, 212, 191,"
-        : "rgba(13, 148, 136,";
+      const lineColor = isDark ? "rgba(45, 212, 191," : "rgba(13, 148, 136,";
+      const nodeColor = isDark ? "rgba(45, 212, 191," : "rgba(13, 148, 136,";
 
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
-        p.vx += (Math.random() - 0.5) * 0.07;
-        p.vy += (Math.random() - 0.5) * 0.07;
+        p.vx += (Math.random() - 0.5) * 0.028;
+        p.vy += (Math.random() - 0.5) * 0.028;
+        p.vx = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, p.vx));
+        p.vy = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, p.vy));
 
         if (p.x < 0) p.x = canvas.width;
         if (p.x > canvas.width) p.x = 0;
@@ -92,6 +109,7 @@ export function NetworkBackground() {
         if (p.y > canvas.height) p.y = 0;
       }
 
+      /* Koneksi antar partikel */
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const a = particles[i];
@@ -100,7 +118,7 @@ export function NetworkBackground() {
           const dy = a.y - b.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < CONNECTION_DIST) {
-            const alpha = (1 - dist / CONNECTION_DIST) * 0.4;
+            const alpha = (1 - dist / CONNECTION_DIST) * 0.35;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
@@ -120,6 +138,38 @@ export function NetworkBackground() {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
         ctx.fillStyle = `${nodeColor}${p.alpha * 0.2})`;
+        ctx.fill();
+      }
+
+      /* Kursor: garis ke node terdekat + tarikan lembut + glow titik */
+      if (!isCoarse && mouseX > -9000) {
+        for (const p of particles) {
+          const dx = p.x - mouseX;
+          const dy = p.y - mouseY;
+          const d = Math.hypot(dx, dy);
+          if (d < MOUSE_DIST) {
+            const strength = 1 - d / MOUSE_DIST;
+            ctx.beginPath();
+            ctx.moveTo(mouseX, mouseY);
+            ctx.lineTo(p.x, p.y);
+            ctx.strokeStyle = `${lineColor}${strength * 0.5})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            // Tarikan lembut menuju kursor
+            if (d > 0.01) {
+              p.vx -= (dx / d) * 0.014;
+              p.vy -= (dy / d) * 0.014;
+            }
+          }
+        }
+        // Titik kursor + aura
+        ctx.beginPath();
+        ctx.arc(mouseX, mouseY, 12, 0, Math.PI * 2);
+        ctx.fillStyle = `${nodeColor}0.15)`;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(mouseX, mouseY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = `${nodeColor}0.9)`;
         ctx.fill();
       }
 
@@ -148,6 +198,10 @@ export function NetworkBackground() {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
+      if (!isCoarse) {
+        window.removeEventListener("mousemove", onMove);
+        window.removeEventListener("mouseout", onLeave);
+      }
     };
   }, []);
 

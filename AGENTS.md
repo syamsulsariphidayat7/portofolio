@@ -4,6 +4,7 @@
 - **Framework:** Next.js 16 (App Router) + React 19 + TypeScript 5.8
 - **Styling:** Tailwind CSS v4
 - **Animasi:** Framer Motion 12
+- **Smooth Scroll:** Lenis (`autoRaf`, native touch)
 - **Theme:** next-themes (dark/light/system)
 - **Package Manager:** pnpm
 - **PWA:** @serwist/next
@@ -11,8 +12,15 @@
 - **Font:** Inter (next/font/google)
 
 ## Fitur
-- Hero dengan typing effect
-- Projects grid + 3D tilt card
+- Hero typing effect + parallax kursor multi-lapisan (avatar, chip, kode, glow)
+- Projects grid + 3D tilt spring + parallax gambar dalam bingkai + glare spotlight
+- Parallax scroll (komponen `Parallax`, orbs dekoratif tiap section)
+- Smooth scroll Lenis + scroll velocity marquee + section heading masked reveal
+- Magnetic button, tilt card reusable, reveal teks per kata
+- Nuansa sci-fi: cyber grid 3D (Tron), scanlines CRT, HUD frame + corner bracket, glitch text, terminal boot loading, readout status (uptime/koordinat), circuit pattern
+- Digital rain Matrix (jarang, komponen `DigitalRain`), radar sweep + energy aura di hero, shooting star
+- Jaringan partikel reaktif kursor (garis + tarikan lembut, `NetworkBackground`)
+- Terminal interaktif easter egg (`TerminalOverlay`): tekan tombol ` buka, perintah help/about/skills/projects/contact/social/whoami/date/clear/exit
 - About (skill bar animasi, timeline)
 - Contact (mailto: langsung ke klien email)
 - Dark/light theme toggle
@@ -41,21 +49,29 @@ src/
 ├── components/
 │   ├── ui/
 │   │   ├── Badge.tsx        # Badge kecil (tag/label)
-│   │   └── Button.tsx       # Reusable button (variant: primary | outline)
+│   │   └── Button.tsx       # Reusable button (variant: primary | outline | light | glass)
 │   ├── providers.tsx        # ThemeProvider wrapper
+│   ├── SmoothScroll.tsx     # Inisialisasi Lenis + intercept anchor link
+│   ├── Parallax.tsx         # Wrapper parallax scroll (props: speed?, global?)
+│   ├── TiltCard.tsx         # Tilt 3D reusable + glare (props: intensity?, glare?)
+│   ├── Magnetic.tsx         # Elemen tertarik kursor (props: strength?)
+│   ├── RevealText.tsx       # Reveal teks per kata (props: text, delay?, stagger?)
 │   ├── Navbar.tsx           # Sticky navbar + bottom nav mobile
-│   ├── HeroSection.tsx      # Hero dengan typing effect
-│   ├── ProjectCard.tsx      # 3D tilt card (props: project, index)
+│   ├── HeroSection.tsx      # Hero: typing effect + parallax kursor/scroll
+│   ├── ProjectCard.tsx      # Tilt spring + parallax gambar + glare (props: project, index)
 │   ├── SkillBar.tsx         # Animated skill bar (props: name, level, index)
 │   ├── Timeline.tsx         # Timeline vertikal (props: items[])
+│   ├── SectionHeading.tsx   # Heading section dengan masked reveal
+│   ├── Marquee.tsx          # Pita teknologi, kecepatan ikut scroll velocity
 │   ├── AnimatedSection.tsx  # Fade-in scroll wrapper (props: delay?)
 │   ├── ThemeToggle.tsx      # Tombol dark/light mode
 │   ├── LoadingScreen.tsx    # Loader animasi di awal
 │   ├── TypingEffect.tsx     # Efek ketik otomatis
-│   ├── AboutCode.tsx        # Alternatif section "tentang" (tidak dipakai)
+│   ├── CursorGlow.tsx       # Glow 2 lapis mengikuti kursor
+│   ├── SocialLinks.tsx      # Ikon sosial media bersama
 │   ├── Footer.tsx           # Footer dengan credit + visitor counter
-│   ├── BackToTop.tsx        # Floating button kembali ke atas
-│   ├── ScrollProgress.tsx   # Progress bar horizontal di atas
+│   ├── BackToTop.tsx        # Floating button kembali ke atas (ring progres)
+│   ├── ScrollProgress.tsx   # Progress bar atas (spring halus)
 │   ├── StatCounter.tsx      # Animated stat counter (props: items[])
 │   ├── InstallPrompt.tsx    # Prompt install PWA
 │   └── VisitorCounter.tsx   # Visitor counter via countapi.xyz
@@ -128,6 +144,7 @@ Ada 6 proyek. Untuk gambar sementara pakai placeholder `/project-1.jpg` s/d `/pr
 - Agent hanya commit lokal, push manual user
 - Deploy: local → GitHub → Vercel + Cloudflare
 - Kontak memakai `mailto:` (tidak pakai Formspree)
+- Smooth scroll Lenis: `autoRaf: true`, touch native; disabled saat `prefers-reduced-motion`
 - Sosial media: handle `syamsulsariphidayat7`
 - `AboutCode.tsx` tidak dipakai
 - Aset placeholder tersedia di `public/` (icon.svg, favicon.ico, avatar.jpg, resume.pdf, project-1..6.jpg). Regenerasi: `bash scripts/generate-assets.sh`

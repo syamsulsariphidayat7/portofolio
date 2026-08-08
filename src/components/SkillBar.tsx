@@ -17,11 +17,11 @@ export function SkillBar({ name, level, index }: SkillBarProps) {
     <div ref={ref} className="group space-y-2">
       <div className="flex items-center justify-between text-sm">
         <span className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300">
-          <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-br from-primary-500 to-teal-400" />
+          <span className="font-mono text-primary-500">▸</span>
           {name}
         </span>
         <span className="font-mono text-xs font-medium text-primary-600 dark:text-primary-400">
-          {level}%
+          [{level}%]
         </span>
       </div>
       <div className="relative h-2.5 overflow-hidden rounded-full bg-slate-100 ring-1 ring-inset ring-slate-200/70 dark:bg-slate-800/70 dark:ring-slate-700/50">
@@ -33,6 +33,11 @@ export function SkillBar({ name, level, index }: SkillBarProps) {
         >
           <span className="shimmer" />
         </motion.div>
+        {/* Tick marks di atas track (terlihat juga di area terisi) */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent_0,transparent_9px,rgba(255,255,255,0.25)_9px,rgba(255,255,255,0.25)_10px)] dark:bg-[repeating-linear-gradient(90deg,transparent_0,transparent_9px,rgba(2,6,23,0.25)_9px,rgba(2,6,23,0.25)_10px)]"
+        />
       </div>
     </div>
   );

@@ -109,6 +109,7 @@ export function Navbar() {
             : "border-b border-transparent bg-transparent"
         }`}
       >
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="group flex items-center gap-2.5">
             <span className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-teal-500 text-lg font-bold text-white shadow-lg shadow-primary-500/25 transition-transform duration-300 group-hover:rotate-3 group-hover:scale-105">
@@ -119,6 +120,7 @@ export function Navbar() {
               {personal.brand}
               <span className="text-primary-500">.</span>
               <span className="ml-1 font-mono text-xs font-normal text-slate-400">dev</span>
+              <span className="ml-1 rounded border border-primary-500/30 bg-primary-500/5 px-1 py-px font-mono text-[9px] font-medium tracking-wider text-primary-600 dark:text-primary-400">v2.1</span>
             </span>
           </Link>
 
@@ -140,7 +142,9 @@ export function Navbar() {
                     transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                   />
                 )}
-                <span className="relative z-10">{link.label}</span>
+                <span className="relative z-10">
+                  {isActive(link.href) ? `[ ${link.label} ]` : link.label}
+                </span>
               </Link>
             ))}
             <a
@@ -155,6 +159,15 @@ export function Navbar() {
               CV
             </a>
             <ThemeToggle />
+            <div aria-hidden="true" className="ml-1 flex h-3 items-end gap-0.5">
+              {[8, 13, 6, 11, 9].map((h, i) => (
+                <span
+                  key={i}
+                  className="eq-bar w-0.5 rounded-sm bg-primary-500/70"
+                  style={{ height: h, animationDelay: `${i * 0.12}s` }}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center md:hidden">
