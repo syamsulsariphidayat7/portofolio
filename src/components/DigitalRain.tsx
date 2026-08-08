@@ -5,10 +5,10 @@ import { useEffect, useRef } from "react";
 const CHARS =
   "アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789<>/{}[]=+*#$%&";
 
-// Kepadatan: hanya ~38% kolom yang aktif secara bersamaan
-const DENSITY = 0.38;
-// Kecepatan dasar (font-units per frame) — pelan
-const BASE_SPEED = 0.42;
+// Kepadatan: hanya ~16% kolom yang aktif secara bersamaan (sangat jarang)
+const DENSITY = 0.16;
+// Kecepatan dasar (font-units per frame) — sangat pelan
+const BASE_SPEED = 0.26;
 
 /** Digital rain ala Matrix — jarang & tenang, sadar tema, nonaktif di reduced-motion & mobile. */
 export function DigitalRain() {
@@ -52,7 +52,7 @@ export function DigitalRain() {
           delays[i] = 0;
         } else {
           drops[i] = null;
-          delays[i] = Math.floor(Math.random() * 260);
+          delays[i] = Math.floor(Math.random() * 420);
         }
       }
     };
@@ -71,14 +71,15 @@ export function DigitalRain() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const isDark = document.documentElement.classList.contains("dark");
       // Fade untuk trail (sesuai tema halaman)
-      ctx.fillStyle = isDark ? "rgba(2, 6, 23, 0.12)" : "rgba(255, 255, 255, 0.08)";
+      /* Fade lebih cepat → trail lebih pendek (tidak memenuhi layar) */
+      ctx.fillStyle = isDark ? "rgba(2, 6, 23, 0.2)" : "rgba(255, 255, 255, 0.14)";
       ctx.fillRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
       ctx.font = `${FONT}px "JetBrains Mono", ui-monospace, monospace`;
       for (let i = 0; i < cols; i++) {
         // Kolom kosong: hitung mundur jeda, lalu peluang kecil untuk muncul
         if (drops[i] === null) {
-          if (--delays[i] <= 0 && Math.random() < 0.03) {
+          if (--delays[i] <= 0 && Math.random() < 0.012) {
             drops[i] = Math.floor(Math.random() * -70);
             speeds[i] = BASE_SPEED * (0.6 + Math.random() * 1.2);
           }
@@ -88,14 +89,14 @@ export function DigitalRain() {
         const pos = drops[i] as number;
         const y = pos * FONT;
         const x = i * FONT;
-        ctx.fillStyle = isDark ? "rgba(94, 234, 212, 0.7)" : "rgba(13, 148, 136, 0.55)";
+        ctx.fillStyle = isDark ? "rgba(94, 234, 212, 0.7)" : "rgba(13, 148, 136, 0.42)";
         ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, y);
 
         if (y > canvas.offsetHeight) {
-          // 60% jadi kosong (istirahat), 40% langsung reset
-          if (Math.random() > 0.4) {
+          // 70% jadi kosong (istirahat lebih lama), 30% langsung reset
+          if (Math.random() > 0.3) {
             drops[i] = null;
-            delays[i] = Math.floor(Math.random() * 200);
+            delays[i] = Math.floor(Math.random() * 320);
           } else {
             drops[i] = Math.floor(Math.random() * -60);
           }

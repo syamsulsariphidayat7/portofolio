@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { SectionHeading } from "@/components/SectionHeading";
-import { ProjectCard } from "@/components/ProjectCard";
+import { ProjectDeck } from "@/components/ProjectDeck";
+import { HologramGlobe } from "@/components/HologramGlobe";
 import { HudFrame } from "@/components/HudFrame";
 import { Button } from "@/components/ui/Button";
-import { projects } from "@/content/projects";
 import { personal } from "@/content/personal";
 
 export const metadata: Metadata = {
@@ -14,7 +14,16 @@ export const metadata: Metadata = {
 export default function ProjectsPage() {
   return (
     <div className="pb-20 pt-24">
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+      <section className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6">
+        {/* Globe hologram interaktif — dekorasi sisi kanan heading */}
+        <div className="absolute right-0 top-1/2 z-10 hidden -translate-y-1/2 lg:right-10 lg:block">
+          <div className="animate-float">
+            <HologramGlobe
+              draggable
+              className="h-28 w-28 drop-shadow-[0_0_18px_rgba(45,212,191,0.35)]"
+            />
+          </div>
+        </div>
         <AnimatedSection>
           <SectionHeading
             eyebrow="// proyek"
@@ -31,11 +40,7 @@ export default function ProjectsPage() {
 
       <AnimatedSection delay={0.1}>
         <section className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </div>
+          <ProjectDeck />
         </section>
       </AnimatedSection>
 

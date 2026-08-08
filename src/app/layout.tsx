@@ -8,10 +8,12 @@ import { BackToTop } from "@/components/BackToTop";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { NetworkBackground } from "@/components/NetworkBackground";
-import { CursorGlow } from "@/components/CursorGlow";
+import { CustomCursor } from "@/components/CustomCursor";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { ViewTransitions } from "@/components/ViewTransitions";
 import { Scanlines } from "@/components/Scanlines";
 import { Telemetry } from "@/components/Telemetry";
+import { SectionNav } from "@/components/SectionNav";
 import { TerminalOverlay } from "@/components/TerminalOverlay";
 import "./globals.css";
 
@@ -46,9 +48,10 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans`}>
         <NetworkBackground />
         <SmoothScroll />
+        <ViewTransitions />
         <ScrollProgress />
         <LoadingScreen />
-        <CursorGlow />
+        <CustomCursor />
         <Scanlines />
         <div aria-hidden="true" className="noise pointer-events-none fixed inset-0 z-[15] opacity-[0.035]" />
         <Providers>
@@ -58,6 +61,7 @@ export default function RootLayout({
         </Providers>
         <BackToTop />
         <Telemetry />
+        <SectionNav />
         <TerminalOverlay />
         <InstallPrompt />
       </body>

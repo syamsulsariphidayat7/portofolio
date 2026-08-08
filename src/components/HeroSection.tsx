@@ -17,6 +17,7 @@ import { Magnetic } from "./Magnetic";
 import { HudFrame } from "./HudFrame";
 import { GlitchText } from "./GlitchText";
 import { DigitalRain } from "./DigitalRain";
+import { HologramGlobe } from "./HologramGlobe";
 import { personal } from "@/content/personal";
 
 function useRotatingRole() {
@@ -286,9 +287,19 @@ export function HeroSection() {
               </motion.div>
             </HudFrame>
 
+            {/* Globe hologram kecil — bisa di-drag dengan mouse/touch */}
+            <motion.div style={{ x: chipX, y: chipY }} className="absolute -top-14 right-0 z-10 lg:-right-3">
+              <div className="animate-float">
+                <HologramGlobe
+                  draggable
+                  className="h-24 w-24 drop-shadow-[0_0_18px_rgba(45,212,191,0.35)] lg:h-28 lg:w-28"
+                />
+              </div>
+            </motion.div>
+
             {/* Chip teknologi mengambang (parallax kursor, float via CSS) */}
             <motion.div style={{ x: chipX, y: chipY }}>
-              <div className="animate-float glass absolute -right-5 -top-5 rounded-full px-3.5 py-1.5 font-mono text-xs text-slate-700 shadow-lg shadow-slate-900/5 dark:text-slate-200">
+              <div className="animate-float glass absolute -left-5 top-10 rounded-full px-3.5 py-1.5 font-mono text-xs text-slate-700 shadow-lg shadow-slate-900/5 dark:text-slate-200">
                 ⚡ Next.js
               </div>
             </motion.div>
@@ -305,7 +316,7 @@ export function HeroSection() {
 
             {/* Kartu kode (parallax berlawanan arah) */}
             <motion.div style={{ x: codeX, y: codeY }}>
-              <div className="animate-float-delayed glass absolute -bottom-10 -left-10 hidden w-64 rounded-2xl shadow-2xl shadow-slate-900/10 sm:block">
+              <div className="animate-float-delayed glass absolute -bottom-10 -left-10 hidden w-64 rounded-2xl shadow-2xl shadow-slate-900/5 sm:block">
                 <div className="flex items-center gap-1.5 px-4 pb-0 pt-3">
                   <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
                   <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />

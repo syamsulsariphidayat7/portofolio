@@ -1,7 +1,15 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useTransform,
+  motionValue,
+  type MotionValue,
+} from "framer-motion";
 import { useRef } from "react";
+
+const STATIC = motionValue(0);
 
 interface TimelineItem {
   year: string;
@@ -12,26 +20,39 @@ interface TimelineItem {
 
 interface TimelineProps {
   items: TimelineItem[];
+  /** Mode scrub: item menyala bertahap mengikuti progress scroll */
+  progress?: MotionValue<number>;
+  total?: number;
 }
 
 function TimelineEntry({
   item,
   index,
   isLast,
+  progress,
+  total,
 }: {
   item: TimelineItem;
   index: number;
   isLast: boolean;
+  progress?: MotionValue<number>;
+  total: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
+  /* Mode scrub: opacity & scale naik saat item memasuki jendela scroll-nya */
+  const local = useTransform(progress ?? STATIC, [index / total, (index + 0.8) / total], [0, 1]);
+  const opacity = useTransform(local, [0.25, 1], [0.3, 1]);
+  const scale = useTransform(local, [0, 1], [0.97, 1]);
+
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: -24 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -24 }}
+      initial={progress ? undefined : { opacity: 0, x: -24 }}
+      animate={progress ? undefined : (isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -24 })}
       transition={{ duration: 0.55, delay: index * 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
+      style={progress ? { opacity, scale } : undefined}
       className="group relative pb-10 pl-12 last:pb-0"
     >
       {!isLast && (
@@ -62,7 +83,7 @@ function TimelineEntry({
   );
 }
 
-export function Timeline({ items }: TimelineProps) {
+export function Timeline({ items, progress, total = items.length }: TimelineProps) {
   return (
     <div className="max-w-2xl">
       {items.map((item, index) => (
@@ -71,6 +92,8 @@ export function Timeline({ items }: TimelineProps) {
           item={item}
           index={index}
           isLast={index === items.length - 1}
+          progress={progress}
+          total={total}
         />
       ))}
     </div>

@@ -2,9 +2,9 @@ import { HeroSection } from "@/components/HeroSection";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { SectionHeading } from "@/components/SectionHeading";
 import { Marquee } from "@/components/Marquee";
-import { ProjectCard } from "@/components/ProjectCard";
-import { SkillBar } from "@/components/SkillBar";
-import { Timeline } from "@/components/Timeline";
+import { HorizontalProjects } from "@/components/HorizontalProjects";
+import { AboutScrolly } from "@/components/AboutScrolly";
+import { HologramGlobe } from "@/components/HologramGlobe";
 import { StatCounter } from "@/components/StatCounter";
 import { Parallax } from "@/components/Parallax";
 import { TiltCard } from "@/components/TiltCard";
@@ -12,7 +12,6 @@ import { HudFrame } from "@/components/HudFrame";
 import { RevealText } from "@/components/RevealText";
 import { Button } from "@/components/ui/Button";
 import { SocialLinks } from "@/components/SocialLinks";
-import { projects } from "@/content/projects";
 import { personal } from "@/content/personal";
 
 const marqueeItems = [
@@ -162,47 +161,16 @@ const contactInfo = [
 
 
 export default function Home() {
-  const featuredProjects = projects.slice(0, 3);
-
   return (
     <>
       <HeroSection />
       <Marquee items={marqueeItems} />
 
-      {/* ===== KARYA ===== */}
-      <section id="work" className="relative overflow-hidden">
-        <Parallax speed={110} className="pointer-events-none absolute -right-28 top-20 h-80 w-80 rounded-full bg-primary-500/10 blur-3xl" />
-        <Parallax speed={-70} className="pointer-events-none absolute -left-28 bottom-32 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
-          <AnimatedSection>
-            <SectionHeading
-              eyebrow="// karya terpilih"
-              title={
-                <>
-                  Proyek <span className="text-gradient">Unggulan</span>
-                </>
-              }
-              description="Beberapa proyek yang baru saja saya kerjakan — dari aplikasi full-stack hingga alat berbasis AI."
-            />
-          </AnimatedSection>
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredProjects.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </div>
-          <div className="mt-12 text-center">
-            <Button href="/projects" variant="outline">
-              Lihat Semua Proyek
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </Button>
-          </div>
-        </div>
-      </section>
+      {/* ===== KARYA — horizontal scroll showcase (teknik scrollytelling awwwards) ===== */}
+      <HorizontalProjects />
 
       {/* ===== LAYANAN ===== */}
-      <section className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
+      <section id="services" className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
         <Parallax speed={80} className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
         <Parallax speed={-100} className="pointer-events-none absolute -right-24 bottom-10 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
@@ -268,39 +236,18 @@ export default function Home() {
             />
           </AnimatedSection>
 
-          <div className="mt-14 grid gap-12 lg:grid-cols-2 lg:gap-16">
-            <AnimatedSection delay={0.1}>
-              <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-                  Keahlian
-                </h3>
-                <span className="font-mono text-xs text-slate-400">
-                  {personal.skills.length} teknologi
-                </span>
-              </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                {personal.skills.map((skill, index) => (
-                  <SkillBar key={skill.name} name={skill.name} level={skill.level} index={index} />
-                ))}
-              </div>
-            </AnimatedSection>
-
-            <AnimatedSection delay={0.2}>
-              <h3 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">
-                Pengalaman
-              </h3>
-              <Timeline items={personal.timeline} />
-            </AnimatedSection>
-          </div>
+          <AboutScrolly />
         </div>
       </section>
 
       {/* ===== STATISTIK ===== */}
-      <section className="relative overflow-hidden border-y border-slate-200 bg-gradient-to-r from-primary-500/5 via-transparent to-teal-500/5 dark:border-slate-800">
+      <section id="stats" className="relative overflow-hidden border-y border-slate-200 bg-gradient-to-r from-primary-500/5 via-transparent to-teal-500/5 dark:border-slate-800">
         <div aria-hidden="true" className="cyber-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
+        {/* Hologram data-core: bola wireframe berputar reaktif kursor */}
+        <HologramGlobe className="pointer-events-none absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 opacity-90" />
         <div
           aria-hidden="true"
-          className="animate-spin-slow pointer-events-none absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-primary-500/15"
+          className="animate-spin-slow pointer-events-none absolute left-1/2 top-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-primary-500/15"
         />
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <AnimatedSection>

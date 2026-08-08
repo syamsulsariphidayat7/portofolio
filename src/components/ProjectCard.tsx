@@ -38,7 +38,10 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
     target: cardRef,
     offset: ["start end", "end start"],
   });
-  const imgY = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"]);
+  /* Numerik + template (pola seragam dengan HorizontalProjects): hindari
+     interpolasi string kompleks/unit lewat useTransform agar aman di Motion 12 */
+  const imgPct = useTransform(scrollYProgress, [0, 1], [-12, 12]);
+  const translateY = useMotionTemplate`${imgPct}%`;
 
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const el = cardRef.current;
@@ -82,7 +85,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
         {/* Gambar dengan parallax internal */}
         <div className="relative aspect-video shrink-0 overflow-hidden">
           <div className="absolute inset-x-0 -inset-y-[14%] will-change-transform">
-            <motion.div style={{ y: reduce ? 0 : imgY }} className="h-full w-full">
+            <motion.div style={{ translateY: reduce ? "0%" : translateY }} className="h-full w-full">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={project.image}
@@ -92,6 +95,12 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               />
             </motion.div>
           </div>
+          {/* Duotone split saat hover (cyan/magenta chromatic aberration) */}
+          <div
+            aria-hidden="true"
+            className="duotone absolute inset-0"
+            style={{ "--duotone-img": `url(${project.image})` } as React.CSSProperties}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
           <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border border-primary-400/30 bg-slate-950/60 px-2 py-1 font-mono text-[10px] font-medium tracking-wider text-primary-300 backdrop-blur-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />

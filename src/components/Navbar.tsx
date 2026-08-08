@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "./ThemeToggle";
+import { DecryptText } from "./DecryptText";
 import { personal } from "@/content/personal";
 
 function useActiveSection(sections: string[]): string {
@@ -143,7 +144,7 @@ export function Navbar() {
                   />
                 )}
                 <span className="relative z-10">
-                  {isActive(link.href) ? `[ ${link.label} ]` : link.label}
+                  <DecryptText text={isActive(link.href) ? `[ ${link.label} ]` : link.label} />
                 </span>
               </Link>
             ))}

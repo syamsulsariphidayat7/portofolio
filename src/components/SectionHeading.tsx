@@ -1,6 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useVelocity,
+  useSpring,
+  useTransform,
+  useReducedMotion,
+} from "framer-motion";
 
 interface SectionHeadingProps {
   eyebrow: string;
@@ -18,6 +25,14 @@ export function SectionHeading({
   className = "",
 }: SectionHeadingProps) {
   const centered = align === "center";
+  const reduce = useReducedMotion();
+
+  /* Velocity skew: judul miring halus mengikuti kecepatan scroll (kinetic typography) */
+  const { scrollY } = useScroll();
+  const velocity = useVelocity(scrollY);
+  const skewRaw = useTransform(velocity, [-1500, 0, 1500], [-4, 0, 4]);
+  const skew = useSpring(skewRaw, { stiffness: 160, damping: 26 });
+
   return (
     <div className={`max-w-2xl ${centered ? "mx-auto text-center" : ""} ${className}`}>
       <motion.span
@@ -39,6 +54,7 @@ export function SectionHeading({
           whileInView={{ y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
+          style={{ skewX: reduce ? 0 : skew }}
           className="mt-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl"
         >
           {title}

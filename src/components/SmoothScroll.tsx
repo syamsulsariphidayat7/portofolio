@@ -4,6 +4,17 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { useReducedMotion } from "framer-motion";
 
+/* Instance Lenis dibagikan agar komponen lain (mis. modal) bisa pause/play scroll */
+let lenisInstance: Lenis | null = null;
+
+export function stopSmoothScroll() {
+  lenisInstance?.stop();
+}
+
+export function startSmoothScroll() {
+  lenisInstance?.start();
+}
+
 export function SmoothScroll() {
   const reduce = useReducedMotion();
 
@@ -17,6 +28,7 @@ export function SmoothScroll() {
       smoothWheel: true,
       // Touch tetap native by default (lebih responsif di mobile) & hemat baterai
     });
+    lenisInstance = lenis;
 
     // Smooth scroll untuk anchor link (termasuk /#section dari halaman yang sama)
     const onClick = (e: MouseEvent) => {
@@ -37,6 +49,7 @@ export function SmoothScroll() {
     window.addEventListener("click", onClick);
     return () => {
       window.removeEventListener("click", onClick);
+      lenisInstance = null;
       lenis.destroy();
     };
   }, [reduce]);

@@ -21,7 +21,10 @@
 - Digital rain Matrix (jarang, komponen `DigitalRain`), radar sweep + energy aura di hero, shooting star
 - Jaringan partikel reaktif kursor (garis + tarikan lembut, `NetworkBackground`)
 - Terminal interaktif easter egg (`TerminalOverlay`): tekan tombol ` buka, perintah help/about/skills/projects/contact/social/whoami/date/clear/exit
-- About (skill bar animasi, timeline)
+- Teknik awwwards: horizontal scroll showcase pinned (`HorizontalProjects`, progress bar + index + dock-focus), page transition View Transitions API (`ViewTransitions`), custom cursor reticle + label kontekstual (`CustomCursor`), stacked cards deck + modal work index (`ProjectDeck`)
+- Velocity skew heading (`SectionHeading`), text decrypt hover (`DecryptText`), scrollytelling skill bar & timeline scrub (`AboutScrolly`, mode `progress` di `SkillBar`/`Timeline`)
+- Hologram wireframe globe canvas (`HologramGlobe`), full-page footer finale, minimap section HUD (`SectionNav`), duotone chromatic split hover (`.duotone`)
+- About (skill bar scrub mengikuti scroll + timeline menyala per item)
 - Contact (mailto: langsung ke klien email)
 - Dark/light theme toggle
 - Navbar sticky + bottom nav mobile
@@ -40,7 +43,7 @@ src/
 ├── app/
 │   ├── globals.css          # Global styles, Tailwind, dark mode vars
 │   ├── layout.tsx           # Root layout (metadata, fonts, wrapper)
-│   ├── page.tsx             # Homepage (Hero + Work + Stats + About + Contact)
+│   ├── page.tsx             # Homepage (Hero + Karya horizontal scroll + Stats + About + Contact)
 │   ├── not-found.tsx        # Custom 404 page
 │   ├── icon.svg             # PWA icon inline (teal + "S")
 │   ├── manifest.ts          # PWA manifest JSON
@@ -51,7 +54,15 @@ src/
 │   │   ├── Badge.tsx        # Badge kecil (tag/label)
 │   │   └── Button.tsx       # Reusable button (variant: primary | outline | light | glass)
 │   ├── providers.tsx        # ThemeProvider wrapper
-│   ├── SmoothScroll.tsx     # Inisialisasi Lenis + intercept anchor link
+│   ├── SmoothScroll.tsx     # Inisialisasi Lenis + intercept anchor; export stop/startSmoothScroll
+│   ├── ViewTransitions.tsx  # Page transition antar rute (View Transitions API, capture + stopPropagation)
+│   ├── CustomCursor.tsx     # Kursor reticle HUD + dot + label data-cursor (pengganti CursorGlow)
+│   ├── DecryptText.tsx      # Teks mendekripsi karakter acak saat hover
+│   ├── SectionNav.tsx       # Minimap section vertikal di tepi kanan (HUD)
+│   ├── HologramGlobe.tsx    # Globe wireframe 3D canvas (reaktif kursor, tanpa three.js)
+│   ├── AboutScrolly.tsx     # Skill bar + timeline scrub mengikuti scroll
+│   ├── HorizontalProjects.tsx # Section Karya pinned horizontal scroll + fallback grid (reduced-motion)
+│   ├── ProjectDeck.tsx      # Deck kartu proyek fan overlap + modal work index (/projects)
 │   ├── Parallax.tsx         # Wrapper parallax scroll (props: speed?, global?)
 │   ├── TiltCard.tsx         # Tilt 3D reusable + glare (props: intensity?, glare?)
 │   ├── Magnetic.tsx         # Elemen tertarik kursor (props: strength?)
@@ -59,15 +70,14 @@ src/
 │   ├── Navbar.tsx           # Sticky navbar + bottom nav mobile
 │   ├── HeroSection.tsx      # Hero: typing effect + parallax kursor/scroll
 │   ├── ProjectCard.tsx      # Tilt spring + parallax gambar + glare (props: project, index)
-│   ├── SkillBar.tsx         # Animated skill bar (props: name, level, index)
-│   ├── Timeline.tsx         # Timeline vertikal (props: items[])
+│   ├── SkillBar.tsx         # Skill bar; mode scrub via prop progress?: MotionValue (props: name, level, index, progress?, total?)
+│   ├── Timeline.tsx         # Timeline vertikal; mode scrub via prop progress?: MotionValue (props: items, progress?, total?)
 │   ├── SectionHeading.tsx   # Heading section dengan masked reveal
 │   ├── Marquee.tsx          # Pita teknologi, kecepatan ikut scroll velocity
 │   ├── AnimatedSection.tsx  # Fade-in scroll wrapper (props: delay?)
 │   ├── ThemeToggle.tsx      # Tombol dark/light mode
 │   ├── LoadingScreen.tsx    # Loader animasi di awal
 │   ├── TypingEffect.tsx     # Efek ketik otomatis
-│   ├── CursorGlow.tsx       # Glow 2 lapis mengikuti kursor
 │   ├── SocialLinks.tsx      # Ikon sosial media bersama
 │   ├── Footer.tsx           # Footer dengan credit + visitor counter
 │   ├── BackToTop.tsx        # Floating button kembali ke atas (ring progres)
@@ -85,8 +95,8 @@ src/
 ## Halaman & Routing
 | Route | File | Konten |
 |---|---|---|
-| `/` | `src/app/page.tsx` | Hero → Work (3 proyek) → Stats → About (bio + skills + timeline) → Contact |
-| `/projects` | `src/app/projects/page.tsx` | Semua proyek (6 item) |
+| `/` | `src/app/page.tsx` | Hero → Karya (horizontal scroll) → Layanan → Tentang (scrollytelling) → Stats (hologram globe) → Kontak → Footer finale |
+| `/projects` | `src/app/projects/page.tsx` | Semua proyek (6 item, stacked deck + modal) |
 
 ## Data Management
 Semua data statis dari TypeScript (`src/content/`). Tidak ada CMS, database, atau API.
@@ -144,7 +154,9 @@ Ada 6 proyek. Untuk gambar sementara pakai placeholder `/project-1.jpg` s/d `/pr
 - Agent hanya commit lokal, push manual user
 - Deploy: local → GitHub → Vercel + Cloudflare
 - Kontak memakai `mailto:` (tidak pakai Formspree)
-- Smooth scroll Lenis: `autoRaf: true`, touch native; disabled saat `prefers-reduced-motion`
+- Smooth scroll Lenis: `autoRaf: true`, touch native; disabled saat `prefers-reduced-motion`; modal bisa pause via `stopSmoothScroll()`/`startSmoothScroll()`
+- Custom cursor: hanya aktif pointer fine + non-reduced-motion; label via atribut `data-cursor`
+- Page transition: `document.startViewTransition` (Chromium); fallback navigasi biasa di browser lain; hash link tetap milik Lenis
 - Sosial media: handle `syamsulsariphidayat7`
 - `AboutCode.tsx` tidak dipakai
 - Aset placeholder tersedia di `public/` (icon.svg, favicon.ico, avatar.jpg, resume.pdf, project-1..6.jpg). Regenerasi: `bash scripts/generate-assets.sh`
