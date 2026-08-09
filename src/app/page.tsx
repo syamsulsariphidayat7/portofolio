@@ -177,13 +177,13 @@ export default function Home() {
 
       {/* ===== LAYANAN ===== */}
       <section id="services" className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
-        <Parallax speed={80} className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
-        <Parallax speed={-100} className="pointer-events-none absolute -right-24 bottom-10 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
-        {/* Ornamen wireframe 3D melayang (parallax scroll) */}
-        <Parallax speed={110} className="pointer-events-none absolute -right-14 top-20 hidden opacity-60 md:block">
+        <Parallax speed={80} scale={1.18} fade className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
+        <Parallax speed={-100} scale={1.22} fade className="pointer-events-none absolute -right-24 bottom-10 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
+        {/* Ornamen wireframe 3D melayang (parallax scroll + rotasi) */}
+        <Parallax speed={110} rotate={30} fade className="pointer-events-none absolute -right-14 top-20 hidden opacity-60 md:block">
           <Float3D variant="rings" size={120} />
         </Parallax>
-        <Parallax speed={-70} className="pointer-events-none absolute -left-8 bottom-28 hidden opacity-50 md:block">
+        <Parallax speed={-70} rotate={-40} className="pointer-events-none absolute -left-8 bottom-28 hidden opacity-50 md:block">
           <Float3D variant="cube" size={76} />
         </Parallax>
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
@@ -234,11 +234,11 @@ export default function Home() {
 
       {/* ===== TENTANG ===== */}
       <section id="about" className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
-        <Parallax speed={-90} className="pointer-events-none absolute -right-32 top-24 h-80 w-80 rounded-full bg-primary-500/10 blur-3xl" />
-        <Parallax speed={95} className="pointer-events-none absolute -left-10 top-16 hidden opacity-50 md:block">
+        <Parallax speed={-90} scale={1.2} fade className="pointer-events-none absolute -right-32 top-24 h-80 w-80 rounded-full bg-primary-500/10 blur-3xl" />
+        <Parallax speed={95} rotate={35} className="pointer-events-none absolute -left-10 top-16 hidden opacity-50 md:block">
           <Float3D variant="cube" size={90} />
         </Parallax>
-        <Parallax speed={-60} className="pointer-events-none absolute right-[12%] bottom-16 hidden opacity-45 lg:block">
+        <Parallax speed={-60} rotate={-45} className="pointer-events-none absolute right-[12%] bottom-16 hidden opacity-45 lg:block">
           <Float3D variant="rings" size={70} />
         </Parallax>
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
@@ -267,10 +267,14 @@ export default function Home() {
           corePosition={[0, 0.6, -2]}
           className="z-0 opacity-90 dark:opacity-100 [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black_25%,transparent_78%)]"
         />
-        <div
-          aria-hidden="true"
-          className="animate-spin-slow pointer-events-none absolute left-1/2 top-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-primary-500/15"
-        />
+        {/* Parallax: -ml-72/-mt-72 dipakai karena framer-motion menulis transform
+            inline (y/scale) yang menimpa translate Tailwind — margin tidak bentrok */}
+        <Parallax speed={60} scale={1.25} fade className="pointer-events-none absolute left-1/2 top-1/2 h-[36rem] w-[36rem] -ml-72 -mt-72">
+          <div
+            aria-hidden="true"
+            className="animate-spin-slow h-full w-full rounded-full border border-dashed border-primary-500/15"
+          />
+        </Parallax>
         <div className="relative z-[1] mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <AnimatedSection>
             <p className="mb-8 text-center font-mono text-[11px] tracking-[0.3em] text-slate-400">
@@ -285,12 +289,12 @@ export default function Home() {
 
       {/* ===== KONTAK ===== */}
       <section id="contact" className="relative overflow-hidden border-b border-slate-200 dark:border-slate-800">
-        <Parallax speed={100} className="pointer-events-none absolute -left-28 top-32 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
-        <Parallax speed={-60} className="pointer-events-none absolute -right-28 bottom-40 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
-        <Parallax speed={-85} className="pointer-events-none absolute right-[8%] top-24 hidden opacity-50 lg:block">
+        <Parallax speed={100} scale={1.18} fade className="pointer-events-none absolute -left-28 top-32 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+        <Parallax speed={-60} scale={1.22} fade className="pointer-events-none absolute -right-28 bottom-40 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
+        <Parallax speed={-85} rotate={40} fade className="pointer-events-none absolute right-[8%] top-24 hidden opacity-50 lg:block">
           <Float3D variant="rings" size={88} />
         </Parallax>
-        <Parallax speed={120} className="pointer-events-none absolute bottom-24 left-[6%] hidden opacity-40 md:block">
+        <Parallax speed={120} rotate={-50} className="pointer-events-none absolute bottom-24 left-[6%] hidden opacity-40 md:block">
           <Float3D variant="cube" size={56} />
         </Parallax>
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
