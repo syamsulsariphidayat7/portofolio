@@ -11,13 +11,17 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { Button } from "./ui/Button";
-import { TypingEffect } from "./TypingEffect";
+import { KineticText } from "./KineticText";
+import { HeroTerminal } from "./HeroTerminal";
 import { SocialLinks } from "./SocialLinks";
 import { Magnetic } from "./Magnetic";
 import { HudFrame } from "./HudFrame";
 import { GlitchText } from "./GlitchText";
-import { DigitalRain } from "./DigitalRain";
 import { HologramGlobe } from "./HologramGlobe";
+import dynamic from "next/dynamic";
+
+/* WebGL 3D di-code-split: tidak menghalangi render awal halaman */
+const Starfield3D = dynamic(() => import("./Starfield3D").then((m) => m.Starfield3D), { ssr: false });
 import { personal } from "@/content/personal";
 
 function useRotatingRole() {
@@ -95,10 +99,8 @@ export function HeroSection() {
       onMouseMove={onMouseMove}
       className="relative flex min-h-screen items-center overflow-hidden"
     >
-      {/* Digital rain ala Matrix (jarang & tenang) */}
-      <div className="pointer-events-none absolute inset-0 opacity-45 dark:opacity-60">
-        <DigitalRain />
-      </div>
+      {/* WebGL 3D: partikel bintang + core wireframe (di belakang semua) */}
+      <Starfield3D className="z-0 opacity-95 dark:opacity-100 [mask-image:radial-gradient(ellipse_78%_72%_at_60%_42%,black_32%,transparent_82%)]" />
 
       {/* Shooting star */}
       <div aria-hidden="true" className="shooting-star" />
@@ -146,7 +148,8 @@ export function HeroSection() {
             </motion.span>
 
             <h1 className="mb-4 mt-5 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
-              <TypingEffect text={`Hai, saya ${personal.name}`} speed={70} delay={500} className="text-gradient-animate" />
+              {/* Kinetic typography: berat kata mengikuti kursor + scroll */}
+              <KineticText text={`Hai, saya ${personal.name}`} className="text-gradient-animate" />
             </h1>
 
             {/* Role berputar */}
@@ -314,28 +317,9 @@ export function HeroSection() {
               </div>
             </motion.div>
 
-            {/* Kartu kode (parallax berlawanan arah) */}
+            {/* Terminal kode mengetik sendiri (parallax berlawanan arah) */}
             <motion.div style={{ x: codeX, y: codeY }}>
-              <div className="animate-float-delayed glass absolute -bottom-10 -left-10 hidden w-64 rounded-2xl shadow-2xl shadow-slate-900/5 sm:block">
-                <div className="flex items-center gap-1.5 px-4 pb-0 pt-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-                  <span className="ml-2 font-mono text-[10px] text-slate-400">developer.ts</span>
-                  <span className="ml-auto font-mono text-[10px] text-primary-500/70">● REC</span>
-                </div>
-                <pre className="overflow-x-auto px-4 pb-4 pt-2 font-mono text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
-                  <code>
-                    <span className="text-purple-500">const</span> dev = {"{"}
-                    {"\n"}  name: <span className="text-emerald-600 dark:text-emerald-400">"{personal.name}"</span>,
-                    {"\n"}  role: <span className="text-emerald-600 dark:text-emerald-400">"{personal.role}"</span>,
-                    {"\n"}  stack: [<span className="text-sky-600 dark:text-sky-400">"Next.js"</span>,{" "}
-                    <span className="text-sky-600 dark:text-sky-400">"TS"</span>],
-                    {"\n"}  hireable: <span className="text-amber-600 dark:text-amber-400">true</span>,
-                    {"\n"}{"}"};
-                  </code>
-                </pre>
-              </div>
+              <HeroTerminal className="animate-float-delayed glass absolute -bottom-10 -left-10 hidden w-64 rounded-2xl shadow-2xl shadow-slate-900/5 sm:block" />
             </motion.div>
           </motion.div>
         </motion.div>

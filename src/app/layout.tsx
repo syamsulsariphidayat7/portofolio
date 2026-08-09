@@ -5,6 +5,8 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { BackToTop } from "@/components/BackToTop";
+import { SoundToggle } from "@/components/SoundToggle";
+import { GlobalSoundFX } from "@/components/GlobalSoundFX";
 import { ScrollProgress } from "@/components/ScrollProgress";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { NetworkBackground } from "@/components/NetworkBackground";
@@ -60,6 +62,8 @@ export default function RootLayout({
           <Footer />
         </Providers>
         <BackToTop />
+        <SoundToggle />
+        <GlobalSoundFX />
         <Telemetry />
         <SectionNav />
         <TerminalOverlay />

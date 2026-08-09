@@ -4,10 +4,16 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { Marquee } from "@/components/Marquee";
 import { HorizontalProjects } from "@/components/HorizontalProjects";
 import { AboutScrolly } from "@/components/AboutScrolly";
-import { HologramGlobe } from "@/components/HologramGlobe";
 import { StatCounter } from "@/components/StatCounter";
+import dynamic from "next/dynamic";
+
+/* WebGL 3D (three.js) di-code-split — chunk sama dgn yang dipakai hero */
+const Starfield3D = dynamic(() =>
+  import("@/components/Starfield3D").then((m) => m.Starfield3D),
+);
 import { Parallax } from "@/components/Parallax";
 import { TiltCard } from "@/components/TiltCard";
+import { Float3D } from "@/components/Float3D";
 import { HudFrame } from "@/components/HudFrame";
 import { RevealText } from "@/components/RevealText";
 import { Button } from "@/components/ui/Button";
@@ -173,6 +179,13 @@ export default function Home() {
       <section id="services" className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
         <Parallax speed={80} className="pointer-events-none absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-teal-500/10 blur-3xl" />
         <Parallax speed={-100} className="pointer-events-none absolute -right-24 bottom-10 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
+        {/* Ornamen wireframe 3D melayang (parallax scroll) */}
+        <Parallax speed={110} className="pointer-events-none absolute -right-14 top-20 hidden opacity-60 md:block">
+          <Float3D variant="rings" size={120} />
+        </Parallax>
+        <Parallax speed={-70} className="pointer-events-none absolute -left-8 bottom-28 hidden opacity-50 md:block">
+          <Float3D variant="cube" size={76} />
+        </Parallax>
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
           <AnimatedSection>
             <SectionHeading
@@ -222,6 +235,12 @@ export default function Home() {
       {/* ===== TENTANG ===== */}
       <section id="about" className="relative overflow-hidden border-t border-slate-200 dark:border-slate-800">
         <Parallax speed={-90} className="pointer-events-none absolute -right-32 top-24 h-80 w-80 rounded-full bg-primary-500/10 blur-3xl" />
+        <Parallax speed={95} className="pointer-events-none absolute -left-10 top-16 hidden opacity-50 md:block">
+          <Float3D variant="cube" size={90} />
+        </Parallax>
+        <Parallax speed={-60} className="pointer-events-none absolute right-[12%] bottom-16 hidden opacity-45 lg:block">
+          <Float3D variant="rings" size={70} />
+        </Parallax>
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
           <AnimatedSection>
             <SectionHeading
@@ -243,13 +262,16 @@ export default function Home() {
       {/* ===== STATISTIK ===== */}
       <section id="stats" className="relative overflow-hidden border-y border-slate-200 bg-gradient-to-r from-primary-500/5 via-transparent to-teal-500/5 dark:border-slate-800">
         <div aria-hidden="true" className="cyber-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
-        {/* Hologram data-core: bola wireframe berputar reaktif kursor */}
-        <HologramGlobe className="pointer-events-none absolute left-1/2 top-1/2 h-[30rem] w-[30rem] -translate-x-1/2 -translate-y-1/2 opacity-90" />
+        {/* WebGL data-core: partikel bintang + icosahedron wireframe (konsisten dgn hero) */}
+        <Starfield3D
+          corePosition={[0, 0.6, -2]}
+          className="z-0 opacity-90 dark:opacity-100 [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black_25%,transparent_78%)]"
+        />
         <div
           aria-hidden="true"
           className="animate-spin-slow pointer-events-none absolute left-1/2 top-1/2 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-primary-500/15"
         />
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="relative z-[1] mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <AnimatedSection>
             <p className="mb-8 text-center font-mono text-[11px] tracking-[0.3em] text-slate-400">
               <span className="text-primary-500">[</span> SYSTEM.DATA{" "}
@@ -265,6 +287,12 @@ export default function Home() {
       <section id="contact" className="relative overflow-hidden border-b border-slate-200 dark:border-slate-800">
         <Parallax speed={100} className="pointer-events-none absolute -left-28 top-32 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
         <Parallax speed={-60} className="pointer-events-none absolute -right-28 bottom-40 h-64 w-64 rounded-full bg-primary-500/10 blur-3xl" />
+        <Parallax speed={-85} className="pointer-events-none absolute right-[8%] top-24 hidden opacity-50 lg:block">
+          <Float3D variant="rings" size={88} />
+        </Parallax>
+        <Parallax speed={120} className="pointer-events-none absolute bottom-24 left-[6%] hidden opacity-40 md:block">
+          <Float3D variant="cube" size={56} />
+        </Parallax>
         <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
           <AnimatedSection>
             <SectionHeading

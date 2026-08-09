@@ -317,6 +317,19 @@ body::after {
   animation: spin-slow 46s linear infinite reverse;
 }
 
+/* ---- Spin 3D penuh (preserve-3d) untuk objek wireframe melayang ---- */
+@keyframes spin-3d {
+  to {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+.animate-3d-spin {
+  animation: spin-3d 18s linear infinite;
+}
+.animate-3d-spin-reverse {
+  animation: spin-3d 26s linear infinite reverse;
+}
+
 /* ---- Grain / noise sinematik ---- */
 .noise {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -713,6 +726,8 @@ html.custom-cursor-active * {
   .animate-gradient-x,
   .animate-spin-slow,
   .animate-spin-slower,
+  .animate-3d-spin,
+  .animate-3d-spin-reverse,
   .animate-radar,
   .eq-bar,
   .shooting-star,

@@ -6,6 +6,8 @@ import {
   useScroll,
   useTransform,
   useMotionTemplate,
+  useMotionValue,
+  useSpring,
   useMotionValueEvent,
   useReducedMotion,
   type MotionValue,
@@ -17,7 +19,11 @@ import { Badge } from "./ui/Badge";
 import { Button } from "./ui/Button";
 import { projects, type Project } from "@/content/projects";
 
-const FEATURED = projects.slice(0, 3);
+const FEATURED = projects.slice(0, 2);
+
+/* Amplitudo maksimum rotateY pass-through (derajat). Dipakai bersama oleh
+   keyframe rotasi dan rentang shadow dinamis agar selalu sinkron. */
+const TILT_AMP = 10;
 
 /* ------------------------------------------------------------------ */
 /* Kartu showcase besar (dengan dock-focus + reveal scrubbed)          */
@@ -56,11 +62,70 @@ function ShowcaseCard({
   /* Dock-focus ala Apple: kartu membesar saat melewati tengah layar */
   const focus = useTransform(local, [0.2, 0.5, 0.8], [1, 1.06, 1]);
 
+  /* ---- 3D pass-through: kartu "menghadap" penonton saat melintas tengah ----
+     rotateY berputar +12° → 0° (flat) → −12° seiring kartu melewati layar,
+     dalam perspektif nyata. Ditambah tilt halus mengikuti mouse (rotateX/Z). */
+  const rotY = useTransform(local, [0, 0.3, 0.5, 0.7, 1], [0, TILT_AMP, 0, -TILT_AMP, 0]);
+
+  /* ---- Shadow dinamis: bayangan bergeser berlawanan arah rotasi + glow ----
+     Digerakkan rotY yang sama → sinkron dengan pass-through. Semakin miring,
+     bayangan makin jauh & pekat, glow teal makin terang (cahaya menyapu tepi). */
+  const shadowX = useTransform(rotY, [-TILT_AMP, 0, TILT_AMP], [22, 0, -22]);
+  const shadowBlur = useTransform(rotY, (v) => 34 + Math.abs(v) * 1.4);
+  const shadowOpacity = useTransform(rotY, (v) => 0.06 + (Math.abs(v) / 10) * 0.16);
+  const glowBlur = useTransform(rotY, (v) => 16 + Math.abs(v) * 0.9);
+  const glowOpacity = useTransform(rotY, (v) => 0.05 + (Math.abs(v) / 10) * 0.13);
+  const cardShadow = useMotionTemplate`${shadowX}px 30px ${shadowBlur}px -6px rgba(2,6,23,${shadowOpacity}), 0 0 ${glowBlur}px rgba(45,212,191,${glowOpacity})`;
+
+  /* ---- Edge-light: strip cahaya pada sisi kartu yang MENGHADAP penonton ----
+     rotY > 0 (tepi kanan maju) → strip kanan menyala; rotY < 0 → strip kiri.
+     Datar di tengah → keduanya padam. Menyala progresif = kesan menyapu. */
+  const rightGlow = useTransform(rotY, [0, TILT_AMP], [0, 1]);
+  const leftGlow = useTransform(rotY, [-TILT_AMP, 0], [1, 0]);
+
+  /* Specular glare: kilau radial mengikuti kursor (pola sama dgn TiltCard) */
+  const gx = useMotionValue(50);
+  const gy = useMotionValue(50);
+  const sgx = useSpring(gx, { stiffness: 150, damping: 22 });
+  const sgy = useSpring(gy, { stiffness: 150, damping: 22 });
+  const glare = useMotionTemplate`radial-gradient(460px circle at ${sgx}% ${sgy}%, rgba(255,255,255,0.16), transparent 62%)`;
+
+  const tiltX = useMotionValue(0);
+  const tiltZ = useMotionValue(0);
+  const smoothTiltX = useSpring(tiltX, { stiffness: 220, damping: 26, mass: 0.5 });
+  const smoothTiltZ = useSpring(tiltZ, { stiffness: 220, damping: 26, mass: 0.5 });
+
+  function onMove(e: React.MouseEvent) {
+    if (reduce) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    tiltX.set(-py * 7);
+    tiltZ.set(px * 3);
+    gx.set((px + 0.5) * 100);
+    gy.set((py + 0.5) * 100);
+  }
+  function onLeave() {
+    tiltX.set(0);
+    tiltZ.set(0);
+    gx.set(50);
+    gy.set(50);
+  }
+
   return (
     <motion.article
       data-cursor="VIEW"
-      style={{ scale: reduce ? 1 : focus }}
-      className="group relative flex h-[62vh] min-h-[26rem] w-[82vw] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/5 will-change-transform sm:w-[62vw] lg:w-[44vw] dark:border-slate-800 dark:bg-slate-900"
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{
+        scale: reduce ? 1 : focus,
+        rotateY: reduce ? 0 : rotY,
+        rotateX: reduce ? 0 : smoothTiltX,
+        rotateZ: reduce ? 0 : smoothTiltZ,
+        transformPerspective: 1500,
+        boxShadow: cardShadow,
+      }}
+      className="group relative flex h-[62vh] min-h-[26rem] w-[82vw] shrink-0 snap-center flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white will-change-transform sm:w-[62vw] lg:w-[44vw] dark:border-slate-800 dark:bg-slate-900"
     >
       {/* Garis neon atas */}
       <div aria-hidden="true" className="absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-primary-500/70 to-transparent" />
@@ -77,6 +142,25 @@ function ShowcaseCard({
       >
         0{index + 1}
       </span>
+
+      {/* Edge-light: strip cahaya menyapu sisi yang menghadap saat pass-through */}
+      <motion.div
+        aria-hidden="true"
+        style={{ opacity: reduce ? 0 : rightGlow }}
+        className="pointer-events-none absolute inset-y-2 right-0 z-20 w-[3px] rounded-full bg-gradient-to-b from-transparent via-primary-300/90 to-transparent shadow-[0_0_14px_2px_rgba(45,212,191,0.45)]"
+      />
+      <motion.div
+        aria-hidden="true"
+        style={{ opacity: reduce ? 0 : leftGlow }}
+        className="pointer-events-none absolute inset-y-2 left-0 z-20 w-[3px] rounded-full bg-gradient-to-b from-transparent via-primary-300/90 to-transparent shadow-[0_0_14px_2px_rgba(45,212,191,0.45)]"
+      />
+
+      {/* Specular glare: kilau menyusuri permukaan mengikuti kursor */}
+      <motion.div
+        aria-hidden="true"
+        style={{ background: glare }}
+        className="pointer-events-none absolute inset-0 z-30 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+      />
 
       {/* Gambar dengan reveal scrubbed */}
       <motion.div
@@ -232,7 +316,7 @@ export function HorizontalProjects() {
             }
             description="Beberapa proyek yang baru saja saya kerjakan — dari aplikasi full-stack hingga alat berbasis AI."
           />
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
             {FEATURED.map((project, index) => (
               <ProjectCard key={project.id} project={project} index={index} />
             ))}
@@ -251,7 +335,7 @@ export function HorizontalProjects() {
   }
 
   return (
-    <section id="work" ref={targetRef} className="relative h-[340vh]">
+    <section id="work" ref={targetRef} className="relative h-[165vh]">
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden pt-24">
         {/* Dekorasi latar */}
         <div

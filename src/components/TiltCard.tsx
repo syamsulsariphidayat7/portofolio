@@ -61,6 +61,7 @@ export function TiltCard({
   return (
     <motion.div
       ref={ref}
+      data-sound="card"
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
       style={{ rotateX: srx, rotateY: sry, transformPerspective: 1000, transformStyle: "preserve-3d" }}

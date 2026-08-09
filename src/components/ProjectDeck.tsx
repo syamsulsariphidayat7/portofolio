@@ -1,12 +1,149 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useMotionTemplate,
+  useReducedMotion,
+} from "framer-motion";
 import { Badge } from "./ui/Badge";
 import { stopSmoothScroll, startSmoothScroll } from "./SmoothScroll";
-import { projects } from "@/content/projects";
+import { projects, type Project } from "@/content/projects";
 
 const total = projects.length;
+
+/* ------------------------------------------------------------------ */
+/* Kartu deck: fan + tilt 3D mengikuti mouse + shadow dinamis + edge-  */
+/* light pada sisi yang menghadap kursor                                */
+/* ------------------------------------------------------------------ */
+function DeckCard({
+  project,
+  i,
+  fan,
+  onOpen,
+}: {
+  project: Project;
+  i: number;
+  fan: number;
+  onOpen: () => void;
+}) {
+  const reduce = useReducedMotion();
+
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const sTiltX = useSpring(tiltX, { stiffness: 220, damping: 26, mass: 0.5 });
+  const sTiltY = useSpring(tiltY, { stiffness: 220, damping: 26, mass: 0.5 });
+
+  /* Shadow dinamis: offset berlawanan arah tilt + makin pekat saat miring */
+  const shadowX = useTransform(sTiltY, (v) => -v * 1.7);
+  const shadowY = useTransform(sTiltX, (v) => v * 1.7 + 16);
+  const shadowBlur = useTransform(
+    [sTiltX, sTiltY],
+    ([a, b]: number[]) => 26 + (Math.abs(a) + Math.abs(b)) * 1.3
+  );
+  const shadowOpacity = useTransform(
+    [sTiltX, sTiltY],
+    ([a, b]: number[]) => 0.07 + ((Math.abs(a) + Math.abs(b)) / 14) * 0.22
+  );
+  const cardShadow = useMotionTemplate`${shadowX}px ${shadowY}px ${shadowBlur}px -4px rgba(2,6,23,${shadowOpacity})`;
+
+  /* Edge-light: sisi yang menghadap kursor menyala (kanan saat tiltY>0) */
+  const rightGlow = useTransform(sTiltY, [0, 8], [0, 1]);
+  const leftGlow = useTransform(sTiltY, [-8, 0], [1, 0]);
+
+  function onMove(e: React.MouseEvent) {
+    if (reduce) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    tiltY.set(px * 10);
+    tiltX.set(-py * 8);
+  }
+  function onLeave() {
+    tiltX.set(0);
+    tiltY.set(0);
+  }
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onOpen}
+      data-cursor="OPEN"
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      initial={{ opacity: 0, y: 44 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: i * 0.06 }}
+      whileHover={{ y: -12, rotate: 0, scale: 1.03 }}
+      style={{
+        rotate: fan,
+        rotateX: reduce ? 0 : sTiltX,
+        rotateY: reduce ? 0 : sTiltY,
+        transformPerspective: 1000,
+        boxShadow: cardShadow,
+      }}
+      className={`group relative w-[min(86vw,22rem)] shrink-0 snap-center overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition-colors duration-300 hover:z-20 hover:border-primary-500/40 lg:w-72 dark:border-slate-800 dark:bg-slate-900 ${
+        i === 0 ? "" : "lg:-ml-32"
+      }`}
+    >
+      <div className="relative aspect-[16/10] overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={project.image}
+          alt={project.title}
+          loading="lazy"
+          className="h-full w-full scale-110 object-cover transition-transform duration-700 group-hover:scale-125"
+        />
+        {/* Duotone split saat hover (cyan/magenta chromatic aberration) */}
+        <div
+          aria-hidden="true"
+          className="duotone absolute inset-0"
+          style={{ "--duotone-img": `url(${project.image})` } as React.CSSProperties}
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
+        <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border border-primary-400/30 bg-slate-950/60 px-2 py-1 font-mono text-[10px] tracking-wider text-primary-300 backdrop-blur-sm">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
+          PRJ-{String(i + 1).padStart(2, "0")}
+        </span>
+        <span className="absolute bottom-3 left-3 font-mono text-xs tracking-widest text-white/80">
+          0{i + 1} / 0{total}
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-3 p-4">
+        <div className="min-w-0">
+          <h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+            {project.title}
+          </h3>
+          <p className="mt-0.5 truncate font-mono text-[11px] text-slate-400">
+            {project.tags.slice(0, 3).join(" · ")}
+          </p>
+        </div>
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary-500/30 text-primary-500 transition-transform duration-300 group-hover:rotate-45">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        </span>
+      </div>
+
+      {/* Edge-light: sisi yang menghadap kursor menyala */}
+      <motion.div
+        aria-hidden="true"
+        style={{ opacity: reduce ? 0 : rightGlow }}
+        className="pointer-events-none absolute inset-y-1 right-0 z-20 w-[3px] rounded-full bg-gradient-to-b from-transparent via-primary-300/90 to-transparent shadow-[0_0_12px_2px_rgba(45,212,191,0.4)]"
+      />
+      <motion.div
+        aria-hidden="true"
+        style={{ opacity: reduce ? 0 : leftGlow }}
+        className="pointer-events-none absolute inset-y-1 left-0 z-20 w-[3px] rounded-full bg-gradient-to-b from-transparent via-primary-300/90 to-transparent shadow-[0_0_12px_2px_rgba(45,212,191,0.4)]"
+      />
+    </motion.button>
+  );
+}
 
 export function ProjectDeck() {
   const [open, setOpen] = useState<number | null>(null);
@@ -39,62 +176,14 @@ export function ProjectDeck() {
       <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:gap-0 lg:overflow-visible lg:pb-0">
         {projects.map((project, i) => {
           const fan = (i - (total - 1) / 2) * 2.4;
-          const isFirst = i === 0;
           return (
-            <motion.button
+            <DeckCard
               key={project.id}
-              type="button"
-              onClick={() => setOpen(i)}
-              data-cursor="OPEN"
-              initial={{ opacity: 0, y: 44 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: i * 0.06 }}
-              whileHover={{ y: -12, rotate: 0, scale: 1.03 }}
-              style={{ rotate: fan }}
-              className={`group relative w-[min(86vw,22rem)] shrink-0 snap-center overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-lg shadow-slate-900/5 transition-colors duration-300 hover:z-20 hover:border-primary-500/40 lg:w-72 dark:border-slate-800 dark:bg-slate-900 ${
-                isFirst ? "" : "lg:-ml-32"
-              }`}
-            >
-              <div className="relative aspect-[16/10] overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  loading="lazy"
-                  className="h-full w-full scale-110 object-cover transition-transform duration-700 group-hover:scale-125"
-                />
-                {/* Duotone split saat hover (cyan/magenta chromatic aberration) */}
-                <div
-                  aria-hidden="true"
-                  className="duotone absolute inset-0"
-                  style={{ "--duotone-img": `url(${project.image})` } as React.CSSProperties}
-                />
-                <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
-                <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border border-primary-400/30 bg-slate-950/60 px-2 py-1 font-mono text-[10px] tracking-wider text-primary-300 backdrop-blur-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
-                  PRJ-{String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="absolute bottom-3 left-3 font-mono text-xs tracking-widest text-white/80">
-                  0{i + 1} / 0{total}
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-3 p-4">
-                <div className="min-w-0">
-                  <h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-                    {project.title}
-                  </h3>
-                  <p className="mt-0.5 truncate font-mono text-[11px] text-slate-400">
-                    {project.tags.slice(0, 3).join(" · ")}
-                  </p>
-                </div>
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary-500/30 text-primary-500 transition-transform duration-300 group-hover:rotate-45">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </span>
-              </div>
-            </motion.button>
+              project={project}
+              i={i}
+              fan={fan}
+              onOpen={() => setOpen(i)}
+            />
           );
         })}
       </div>
