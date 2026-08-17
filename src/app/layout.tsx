@@ -17,6 +17,7 @@ import { Scanlines } from "@/components/Scanlines";
 import { Telemetry } from "@/components/Telemetry";
 import { SectionNav } from "@/components/SectionNav";
 import { TerminalOverlay } from "@/components/TerminalOverlay";
+import { SerwistProvider } from "@serwist/turbopack/react";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -68,6 +69,7 @@ export default function RootLayout({
         <SectionNav />
         <TerminalOverlay />
         <InstallPrompt />
+        <SerwistProvider swUrl="/serwist/sw.js" />
       </body>
     </html>
   );
