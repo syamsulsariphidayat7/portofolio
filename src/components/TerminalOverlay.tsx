@@ -47,10 +47,16 @@ export function TerminalOverlay() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  /* Sesi baru: tampilkan banner bila layar sempat dikosongkan (clear) —
+     penyesuaian state saat transisi `open` berubah, bukan di effect. */
+  const [prevOpen, setPrevOpen] = useState(open);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open && lines.length === 0) setLines(WELCOME);
+  }
+
   useEffect(() => {
     if (open) {
-      // Sesi baru: tampilkan banner bila layar sempat dikosongkan (clear)
-      setLines((prev) => (prev.length === 0 ? WELCOME : prev));
       const t = setTimeout(() => inputRef.current?.focus(), 60);
       return () => clearTimeout(t);
     }

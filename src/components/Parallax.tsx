@@ -39,9 +39,17 @@ export function Parallax({
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
-  const { scrollYProgress } = global
-    ? useScroll()
-    : useScroll({ target: ref, offset: ["start end", "end start"] });
+  /* Kedua hook dipanggil tanpa syarat (aturan hooks); yang dipakai dipilih
+     sesudahnya. Dulu dipilih lewat ternary — urutan hook bisa berubah bila
+     prop `global` berubah antar-render. */
+  const globalScroll = useScroll();
+  const localScroll = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const scrollYProgress = global
+    ? globalScroll.scrollYProgress
+    : localScroll.scrollYProgress;
 
   /* Lapisan kedalaman: posisi (Y atau X), rotasi, skala, dan opacity semuanya
      digerakkan oleh progress scroll yang sama → bergerak serempak tapi tiap

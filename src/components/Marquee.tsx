@@ -69,7 +69,7 @@ export function Marquee({ items, className = "" }: MarqueeProps) {
               >
                 {item}
               </span>
-              <span className="font-mono text-[10px] text-primary-500/70">//</span>
+              <span className="font-mono text-[10px] text-primary-500/70">{"//"}</span>
             </span>
           ))}
         </div>

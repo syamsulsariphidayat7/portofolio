@@ -7,14 +7,15 @@ import { personal } from "@/content/personal";
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
   const [show, setShow] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  // Baca status dismiss langsung saat init (guard typeof window untuk SSR);
+  // prompt belum tampil di render pertama, jadi tak ada hydration mismatch.
+  const [dismissed, setDismissed] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      !!localStorage.getItem("pwa-dismissed"),
+  );
 
   useEffect(() => {
-    if (localStorage.getItem("pwa-dismissed")) {
-      setDismissed(true);
-      return;
-    }
-
     function handler(e: Event) {
       e.preventDefault();
       setDeferredPrompt(e);

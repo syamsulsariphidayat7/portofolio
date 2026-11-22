@@ -9,7 +9,10 @@ export function VisitorCounter() {
   const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch(`https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`)
+    // Dulu api.countapi.xyz — layanan itu sudah mati (domain tak merespons),
+    // jadi counter selalu tampil "?". Abacus adalah penerus drop-in dengan
+    // model namespace/key dan bentuk respons { value } yang sama.
+    fetch(`https://abacus.jasoncameron.dev/hit/${NAMESPACE}/${KEY}`)
       .then((res) => res.json())
       .then((data) => setCount(data.value))
       .catch(() => setCount(null));

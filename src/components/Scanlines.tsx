@@ -1,18 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribeReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 /** Overlay CRT: scanlines statis + garis scan berjalan. Dinonaktifkan saat reduced-motion. */
 export function Scanlines() {
-  const [fine, setFine] = useState(true);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setFine(!mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setFine(!e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  // Server snapshot false = perilaku awal lama (scanlines tampil penuh)
+  const reducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    () => false,
+  );
+  const fine = !reducedMotion;
 
   if (!fine) return null;
 

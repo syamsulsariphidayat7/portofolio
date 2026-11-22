@@ -1,16 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+function subscribeSecond(onChange: () => void) {
+  const id = setInterval(onChange, 1000);
+  return () => clearInterval(id);
+}
+
+/* Detik epoch sebagai snapshot: nilainya stabil di antara dua tick, jadi
+   aman untuk useSyncExternalStore (Date baru tiap panggil akan loop). */
+function getSecondSnapshot() {
+  return Math.floor(Date.now() / 1000);
+}
 
 /** Widget HUD telemetry (desktop): jam live, tanggal, koordinat, status link, equalizer sinyal. */
 export function Telemetry() {
-  const [now, setNow] = useState<Date | null>(null);
-
-  useEffect(() => {
-    setNow(new Date());
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
+  const epochSec = useSyncExternalStore(
+    subscribeSecond,
+    getSecondSnapshot,
+    () => null,
+  );
+  const now = epochSec === null ? null : new Date(epochSec * 1000);
 
   const time = now ? now.toLocaleTimeString("id-ID", { hour12: false }) : "--:--:--";
   const date = now

@@ -1,14 +1,19 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const emptySubscribe = () => () => {};
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  // "mounted" tanpa effect+setState: false di server/prerender, true di klien
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   if (!mounted) return <div className="h-9 w-9" />;
 

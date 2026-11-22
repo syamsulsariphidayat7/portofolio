@@ -20,11 +20,19 @@ export function DecryptText({ text, className = "", speed = 26 }: DecryptTextPro
   const [display, setDisplay] = useState(text);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /* Reset saat teks berubah (mis. label nav aktif bertambah bracket).
-     Timer dari run sebelumnya ikut dibatalkan agar tidak menimpa teks baru. */
+  /* Reset saat teks berubah (mis. label nav aktif bertambah bracket) —
+     pola penyesuaian state saat render (bukan effect): React me-render ulang
+     komponen ini sebelum commit. */
+  const [prevText, setPrevText] = useState(text);
+  if (text !== prevText) {
+    setPrevText(text);
+    setDisplay(text);
+  }
+
+  /* Timer dari run sebelumnya dibatalkan agar tidak menimpa teks baru
+     (effect ini hanya menyentuh ref, tanpa setState). */
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    setDisplay(text);
   }, [text]);
 
   useEffect(

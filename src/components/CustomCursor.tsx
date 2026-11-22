@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   motion,
   AnimatePresence,
@@ -17,9 +17,26 @@ import {
  *   dari atribut `data-cursor` (mis. VIEW / OPEN / CLOSE)
  * - Hanya aktif di perangkat pointer halus (desktop) & nonaktif saat reduced-motion
  */
+function subscribePointerFine(onChange: () => void) {
+  const mq = window.matchMedia("(pointer: fine)");
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function getPointerFineSnapshot() {
+  return window.matchMedia("(pointer: fine)").matches;
+}
+
 export function CustomCursor() {
   const reduce = useReducedMotion();
-  const [enabled, setEnabled] = useState(false);
+  const pointerFine = useSyncExternalStore(
+    subscribePointerFine,
+    getPointerFineSnapshot,
+    () => false,
+  );
+  /* Dulu state `enabled` di-set dari effect. Sekarang diturunkan langsung:
+     aktif hanya bila pointer halus dan bukan reduced-motion. */
+  const enabled = !reduce && pointerFine;
   const [label, setLabel] = useState<string | null>(null);
 
   /* Posisi mentah dari mouse */
@@ -35,18 +52,15 @@ export function CustomCursor() {
   const glowY = useSpring(y, { stiffness: 80, damping: 22 });
   const scale = useSpring(1, { stiffness: 300, damping: 24 });
 
+  /* Kelas di <html> mengikuti status aktif (untuk menyembunyikan kursor bawaan) */
   useEffect(() => {
-    if (reduce) {
-      // useReducedMotion() bernilai null di render pertama; kunci benar saat terisi
-      setEnabled(false);
+    if (!enabled) {
       document.documentElement.classList.remove("custom-cursor-active");
       return;
     }
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-    setEnabled(true);
     document.documentElement.classList.add("custom-cursor-active");
     return () => document.documentElement.classList.remove("custom-cursor-active");
-  }, [reduce]);
+  }, [enabled]);
 
   useEffect(() => {
     if (!enabled) return;

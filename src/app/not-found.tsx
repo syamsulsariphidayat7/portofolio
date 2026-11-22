@@ -11,7 +11,7 @@ export default function NotFound() {
       <div className="relative text-center">
         <p className="font-mono text-sm font-medium tracking-widest text-primary-600 dark:text-primary-400">
           <span className="text-slate-400">[</span> ERROR 404{" "}
-          <span className="text-slate-400">//</span> SIGNAL LOST{" "}
+          <span className="text-slate-400">{"//"}</span> SIGNAL LOST{" "}
           <span className="text-slate-400">]</span>
         </p>
         <h1 className="mt-4 text-8xl font-bold tracking-tighter sm:text-9xl">

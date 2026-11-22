@@ -348,7 +348,7 @@ export function HorizontalProjects() {
         {/* Header overlay */}
         <div className="pointer-events-none absolute left-[6vw] top-20 z-10 lg:top-24">
           <p className="font-mono text-sm font-medium text-primary-600 dark:text-primary-400">
-            <span className="text-slate-400">[</span> // karya terpilih{" "}
+            <span className="text-slate-400">[</span> {"//"} karya terpilih{" "}
             <span className="text-slate-400">]</span>
           </p>
           <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
@@ -359,8 +359,11 @@ export function HorizontalProjects() {
           </p>
         </div>
 
-        {/* Track kartu */}
-        <div ref={trackRef} className="flex w-max items-center gap-8 pl-[6vw] pr-[16vw] lg:gap-12">
+        {/* Track kartu — WAJIB motion.div dengan style x: transform `x` di
+            atas memang untuk menggeser track ini. Dulu elemen ini div biasa,
+            jadi track tidak pernah bergerak dan kartu di luar layar tidak
+            bisa dicapai. */}
+        <motion.div ref={trackRef} style={{ x }} className="flex w-max items-center gap-8 pl-[6vw] pr-[16vw] lg:gap-12">
           {FEATURED.map((project, index) => (
             <ShowcaseCard
               key={project.id}
@@ -398,7 +401,7 @@ export function HorizontalProjects() {
               </svg>
             </span>
           </a>
-        </div>
+        </motion.div>
 
         {/* Progress bar + index */}
         <div className="absolute bottom-6 z-10 left-[6vw] right-[6vw] lg:left-[24vw]">

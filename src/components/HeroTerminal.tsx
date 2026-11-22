@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 type Seg = { t: string; c: string };
 type Line = { segs: Seg[]; speed?: number; pause?: number };
@@ -98,17 +98,30 @@ const lineLen = (i: number) => SCRIPT[i].segs.reduce((n, s) => n + s.t.length, 0
  * berulang. Berhenti saat keluar layar, dan untuk prefers-reduced-motion
  * langsung menampilkan hasil akhir (tanpa animasi).
  */
+function subscribeReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function getReducedMotionSnapshot() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function HeroTerminal({ className = "" }: { className?: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [reduce, setReduce] = useState(false);
+  const reduce = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    () => false,
+  );
   const [active, setActive] = useState(true);
   const [line, setLine] = useState(0);
   const [char, setChar] = useState(0);
-  const [done, setDone] = useState(false);
-
-  useEffect(() => {
-    setReduce(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
+  /* Selesai = baris terakhir sudah terketik penuh. Dulu ini state `done`
+     yang di-set sinkron di dalam effect (pola yang dilarang react-hooks);
+     sekarang cukup diturunkan dari line/char. */
+  const done = line === SCRIPT.length - 1 && char >= lineLen(line);
 
   /* Pause saat terminal keluar dari layar */
   useEffect(() => {
@@ -129,7 +142,6 @@ export function HeroTerminal({ className = "" }: { className?: string }) {
       const t = setTimeout(() => {
         setLine(0);
         setChar(0);
-        setDone(false);
       }, SCRIPT[SCRIPT.length - 1].pause ?? 3000);
       return () => clearTimeout(t);
     }
@@ -146,8 +158,6 @@ export function HeroTerminal({ className = "" }: { className?: string }) {
       }, SCRIPT[line].pause ?? 300);
       return () => clearTimeout(t);
     }
-
-    setDone(true);
   }, [line, char, done, active, reduce]);
 
   const showAll = reduce || done;

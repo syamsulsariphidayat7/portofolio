@@ -211,7 +211,7 @@ export function LoadingScreen() {
               {/* Brand + versi */}
               <div className="mt-5 flex items-center gap-2 font-mono text-[10px] tracking-[0.3em] text-slate-500">
                 <span className="h-px w-6 bg-gradient-to-r from-transparent to-primary-500/60" />
-                {personal.brand.toUpperCase()} // PORTFOLIO
+                {personal.brand.toUpperCase()} {"//"} PORTFOLIO
                 <span className="h-px w-6 bg-gradient-to-l from-transparent to-primary-500/60" />
               </div>
               <p className="mt-1 font-mono text-[9px] tracking-[0.25em] text-slate-600">v3.0.0 — SYSTEM.READY</p>

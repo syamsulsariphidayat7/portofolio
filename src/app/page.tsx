@@ -279,7 +279,7 @@ export default function Home() {
           <AnimatedSection>
             <p className="mb-8 text-center font-mono text-[11px] tracking-[0.3em] text-slate-400">
               <span className="text-primary-500">[</span> SYSTEM.DATA{" "}
-              <span className="text-primary-500">//</span> REAL-TIME{" "}
+              <span className="text-primary-500">{"//"}</span> REAL-TIME{" "}
               <span className="text-primary-500">]</span>
             </p>
             <StatCounter items={personal.stats} />

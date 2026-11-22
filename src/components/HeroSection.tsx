@@ -141,7 +141,7 @@ export function HeroSection() {
               </span>
               <span className="text-slate-400">[</span>
               AVAILABLE
-              <span className="text-slate-400">//</span>
+              <span className="text-slate-400">{"//"}</span>
               OPEN FOR WORK
               <span className="text-slate-400">]</span>
               <span className="animate-blink text-primary-400">▌</span>
