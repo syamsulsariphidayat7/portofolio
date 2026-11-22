@@ -1,21 +1,18 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-  useReducedMotion,
-} from "framer-motion";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 
 /**
- * Kursor kustom ala awwwards:
- * - Reticle crosshair HUD (ring + tick sudut + ring putus-putus berputar)
- * - Dot teal responsif cepat + glow & trail lembut
- * - Membesar saat hover elemen interaktif, menampilkan label kontekstual
- *   dari atribut `data-cursor` (mis. VIEW / OPEN / CLOSE)
- * - Hanya aktif di perangkat pointer halus (desktop) & nonaktif saat reduced-motion
+ * Pointer "Normal+":
+ * - Kursor bawaan browser TETAP tampil dan jadi penunjuk utama
+ *   (tidak ada lagi `cursor: none` / reticle HUD / dot / glow / label).
+ * - Satu ring tipis teal mengikuti mouse dengan spring longgar (lag halus)
+ *   sebagai aksen identitas.
+ * - Hover elemen interaktif: ring membesar 1,5x sambil memudar.
+ * - Klik: ring menyusut sebentar ke 0,85x.
+ * - Hanya aktif di perangkat pointer halus (desktop) & nonaktif saat
+ *   reduced-motion.
  */
 function subscribePointerFine(onChange: () => void) {
   const mq = window.matchMedia("(pointer: fine)");
@@ -34,33 +31,30 @@ export function CustomCursor() {
     getPointerFineSnapshot,
     () => false,
   );
-  /* Dulu state `enabled` di-set dari effect. Sekarang diturunkan langsung:
-     aktif hanya bila pointer halus dan bukan reduced-motion. */
   const enabled = !reduce && pointerFine;
-  const [label, setLabel] = useState<string | null>(null);
+
+  const [hovering, setHovering] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const hoveringRef = useRef(false);
 
   /* Posisi mentah dari mouse */
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
 
-  /* Lapisan dengan "berat" berbeda: dot cepat, ring sedang, glow lambat */
-  const dotX = useSpring(x, { stiffness: 900, damping: 45, mass: 0.2 });
-  const dotY = useSpring(y, { stiffness: 900, damping: 45, mass: 0.2 });
+  /* Ring mengikuti dengan spring longgar — sumber lag halus khas Normal+ */
   const ringX = useSpring(x, { stiffness: 260, damping: 26, mass: 0.5 });
   const ringY = useSpring(y, { stiffness: 260, damping: 26, mass: 0.5 });
-  const glowX = useSpring(x, { stiffness: 80, damping: 22 });
-  const glowY = useSpring(y, { stiffness: 80, damping: 22 });
-  const scale = useSpring(1, { stiffness: 300, damping: 24 });
 
-  /* Kelas di <html> mengikuti status aktif (untuk menyembunyikan kursor bawaan) */
+  /* Skala + opacity ring sebagai motion value berspring */
+  const scale = useMotionValue(1);
+  const smoothScale = useSpring(scale, { stiffness: 300, damping: 24 });
+  const opacity = useMotionValue(1);
+  const smoothOpacity = useSpring(opacity, { stiffness: 300, damping: 28 });
+
   useEffect(() => {
-    if (!enabled) {
-      document.documentElement.classList.remove("custom-cursor-active");
-      return;
-    }
-    document.documentElement.classList.add("custom-cursor-active");
-    return () => document.documentElement.classList.remove("custom-cursor-active");
-  }, [enabled]);
+    scale.set(pressed ? 0.85 : hovering ? 1.5 : 1);
+    opacity.set(hovering && !pressed ? 0.55 : 1);
+  }, [hovering, pressed, scale, opacity]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -68,68 +62,40 @@ export function CustomCursor() {
       x.set(e.clientX);
       y.set(e.clientY);
       const target = e.target as HTMLElement | null;
-      const interactive = target?.closest?.<HTMLElement>(
+      const interactive = !!target?.closest?.(
         'a, button, [data-cursor], [role="button"]',
       );
-      if (interactive) {
-        scale.set(1.25);
-        const c = interactive.dataset.cursor;
-        setLabel(c ? c : null);
-      } else {
-        scale.set(1);
-        setLabel(null);
+      if (interactive !== hoveringRef.current) {
+        hoveringRef.current = interactive;
+        setHovering(interactive);
       }
     };
+    const onDown = () => setPressed(true);
+    const onUp = () => setPressed(false);
     window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
-  }, [enabled, x, y, scale]);
+    window.addEventListener("mousedown", onDown);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [enabled, x, y]);
 
   if (!enabled) return null;
 
   return (
-    <>
-      {/* Glow halus mengikuti kursor (kecil & redup) */}
-      <motion.div
-        aria-hidden="true"
-        className="cursor-glow pointer-events-none fixed left-0 top-0 z-20"
-        style={{ x: glowX, y: glowY, translateX: "-50%", translateY: "-50%" }}
-      />
-
-      {/* Reticle crosshair */}
-      <motion.div
-        aria-hidden="true"
-        className="cursor-reticle pointer-events-none fixed left-0 top-0 z-[95]"
-        style={{ x: ringX, y: ringY, translateX: "-50%", translateY: "-50%", scale }}
-      >
-        <span className="cursor-tick cursor-tick--tl" />
-        <span className="cursor-tick cursor-tick--tr" />
-        <span className="cursor-tick cursor-tick--bl" />
-        <span className="cursor-tick cursor-tick--br" />
-      </motion.div>
-
-      {/* Dot tengah */}
-      <motion.div
-        aria-hidden="true"
-        className="cursor-dot pointer-events-none fixed left-0 top-0 z-[95]"
-        style={{ x: dotX, y: dotY, translateX: "-50%", translateY: "-50%" }}
-      />
-
-      {/* Label kontekstual */}
-      <AnimatePresence>
-        {label && (
-          <motion.div
-            aria-hidden="true"
-            className="cursor-label pointer-events-none fixed left-0 top-0 z-[95] font-mono uppercase"
-            style={{ x: ringX, y: ringY, translateX: 24, translateY: -26 }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.15 }}
-          >
-            {label}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+    <motion.div
+      aria-hidden="true"
+      className="cursor-ring pointer-events-none fixed left-0 top-0 z-[95]"
+      style={{
+        x: ringX,
+        y: ringY,
+        translateX: "-50%",
+        translateY: "-50%",
+        scale: smoothScale,
+        opacity: smoothOpacity,
+      }}
+    />
   );
 }

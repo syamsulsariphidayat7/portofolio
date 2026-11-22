@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLang } from "@/lib/i18n";
 import { motion, AnimatePresence } from "framer-motion";
 import { personal } from "@/content/personal";
 
 export function InstallPrompt() {
+  const { t } = useLang();
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
   const [show, setShow] = useState(false);
   // Baca status dismiss langsung saat init (guard typeof window untuk SSR);
@@ -59,17 +61,17 @@ export function InstallPrompt() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                Install Aplikasi {personal.brand}
+                {t.install.title} {personal.brand}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                Akses cepat dari layar utama
+                {t.install.subtitle}
               </p>
             </div>
             <button
               onClick={handleInstall}
               className="shrink-0 px-4 py-2 rounded-xl text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 transition-colors"
             >
-              Install
+              {t.install.install}
             </button>
             <button
               onClick={handleDismiss}

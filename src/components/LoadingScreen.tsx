@@ -5,12 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { personal } from "@/content/personal";
 import { HologramGlobe } from "./HologramGlobe";
 import { uiSound } from "@/lib/uiSound";
+import { bootSignal } from "@/lib/bootSignal";
 
 const BOOT_LINES = [
   "> init core modules ............... OK",
   "> load stack: next/react/ts ....... OK",
   "> establish secure link ........... OK",
-  "> mount avatar.profile ............ OK",
+  "> mount terminal.ui ............... OK",
   "> system online — welcome",
 ];
 
@@ -78,6 +79,13 @@ export function LoadingScreen() {
     };
     raf = requestAnimationFrame(tick);
     const hide = setTimeout(() => setShow(false), total + 460);
+    /* Sinyal boot untuk hero DITUNDA ±500ms setelah tirai mulai membuka
+       (revisi 22 Nov 2026): tirai butuh 0,75 dtk dan konten boot memudar
+       0,4 dtk — kalau sinyal dikirim tepat saat tirai mulai bergerak,
+       tangga awal hero (badge 0,1 + bio 0,35) sudah keburu jalan selagi
+       layar masih tertutup. Di +500ms tirai sudah ±2/3 terbuka dari
+       tengah, jadi seluruh tangga terlihat utuh. */
+    const signal = setTimeout(() => bootSignal.markDone(), total + 460 + 500);
     const interval = setInterval(
       () => setVisible((v) => Math.min(v + 1, BOOT_LINES.length)),
       reduce ? 90 : 200
@@ -86,6 +94,7 @@ export function LoadingScreen() {
       uiSound.setBootActive(false);
       cancelAnimationFrame(raf);
       clearTimeout(hide);
+      clearTimeout(signal);
       clearInterval(interval);
     };
   }, []);

@@ -12,22 +12,23 @@
 - **Font:** Inter (next/font/google)
 
 ## Fitur
-- Hero typing effect + parallax kursor multi-lapisan (avatar, chip, kode, glow)
+- Hero: judul kinetic text + terminal mengetik sebagai visual utama + parallax kursor multi-lapisan (terminal, chip, glow)
 - Projects grid + 3D tilt spring + parallax gambar dalam bingkai + glare spotlight
 - Parallax scroll (komponen `Parallax`, orbs dekoratif tiap section)
-- Smooth scroll Lenis + scroll velocity marquee + section heading masked reveal
+- Smooth scroll Lenis + marquee kecepatan konstan (32 dtk) + section heading masked reveal
 - Magnetic button, tilt card reusable, reveal teks per kata
 - Nuansa sci-fi: cyber grid 3D (Tron), scanlines CRT, HUD frame + corner bracket, glitch text, terminal boot loading, readout status (uptime/koordinat), circuit pattern
-- Digital rain Matrix (jarang, komponen `DigitalRain`), radar sweep + energy aura di hero, shooting star
+- Digital rain Matrix (jarang, komponen `DigitalRain`), bingkai HUD bracket berdenyut di hero (pengganti radar sweep + energy aura), shooting star
 - Jaringan partikel reaktif kursor (garis + tarikan lembut, `NetworkBackground`)
 - Terminal interaktif easter egg (`TerminalOverlay`): tekan tombol ` buka, perintah help/about/skills/projects/contact/social/whoami/date/clear/exit
-- Teknik awwwards: horizontal scroll showcase pinned (`HorizontalProjects`, progress bar + index + dock-focus), page transition View Transitions API (`ViewTransitions`), custom cursor reticle + label kontekstual (`CustomCursor`), stacked cards deck + modal work index (`ProjectDeck`)
+- Teknik awwwards: horizontal scroll showcase pinned (`HorizontalProjects`, progress bar + index + dock-focus), page transition View Transitions API (`ViewTransitions`), pointer Normal+ — ring aksen tipis mengikuti kursor bawaan (`CustomCursor`), list baris index proyek + modal detail (`ProjectIndex`)
 - Velocity skew heading (`SectionHeading`), text decrypt hover (`DecryptText`), scrollytelling skill bar & timeline scrub (`AboutScrolly`, mode `progress` di `SkillBar`/`Timeline`)
 - Hologram wireframe globe canvas (`HologramGlobe`), full-page footer finale, minimap section HUD (`SectionNav`), duotone chromatic split hover (`.duotone`)
 - About (skill bar scrub mengikuti scroll + timeline menyala per item)
 - Contact (mailto: langsung ke klien email)
 - Dark/light theme toggle
-- Navbar sticky + bottom nav mobile
+- Multi-bahasa ID/EN: kamus statis `src/lib/i18n.tsx` (store eksternal + localStorage `pf-lang`, bawaan ID), toggle `LangToggle` di navbar; label HUD/teknis yang memang Inggris (log boot, skrip terminal, SYSTEM.DATA, dst.) tetap Inggris di kedua bahasa
+- Navbar selalu tampil (hide-on-scroll dicabut) + bottom nav mobile; menu: Beranda, Unggulan, Tentang, Proyek, Kontak
 - Loading screen
 - Smooth scroll
 - Custom 404 page
@@ -56,26 +57,28 @@ src/
 │   ├── providers.tsx        # ThemeProvider wrapper
 │   ├── SmoothScroll.tsx     # Inisialisasi Lenis + intercept anchor; export stop/startSmoothScroll
 │   ├── ViewTransitions.tsx  # Page transition antar rute (View Transitions API, capture + stopPropagation)
-│   ├── CustomCursor.tsx     # Kursor reticle HUD + dot + label data-cursor (pengganti CursorGlow)
+│   ├── CustomCursor.tsx     # Pointer Normal+: ring tipis mengikuti kursor bawaan (hover membesar 1,5x, klik menyusut 0,85x)
 │   ├── DecryptText.tsx      # Teks mendekripsi karakter acak saat hover
 │   ├── SectionNav.tsx       # Minimap section vertikal di tepi kanan (HUD)
 │   ├── HologramGlobe.tsx    # Globe wireframe 3D canvas (reaktif kursor, tanpa three.js)
 │   ├── AboutScrolly.tsx     # Skill bar + timeline scrub mengikuti scroll
 │   ├── HorizontalProjects.tsx # Section Karya pinned horizontal scroll + fallback grid (reduced-motion)
-│   ├── ProjectDeck.tsx      # Deck kartu proyek fan overlap + modal work index (/projects)
+│   ├── ProjectIndex.tsx # List baris index proyek + modal detail (/projects)
 │   ├── Parallax.tsx         # Wrapper parallax scroll (props: speed?, global?)
 │   ├── TiltCard.tsx         # Tilt 3D reusable + glare (props: intensity?, glare?)
 │   ├── Magnetic.tsx         # Elemen tertarik kursor (props: strength?)
 │   ├── RevealText.tsx       # Reveal teks per kata (props: text, delay?, stagger?)
 │   ├── Navbar.tsx           # Sticky navbar + bottom nav mobile
-│   ├── HeroSection.tsx      # Hero: typing effect + parallax kursor/scroll
+│   ├── HeroSection.tsx      # Hero: kinetic text + terminal visual utama + parallax kursor/scroll
 │   ├── ProjectCard.tsx      # Tilt spring + parallax gambar + glare (props: project, index)
 │   ├── SkillBar.tsx         # Skill bar; mode scrub via prop progress?: MotionValue (props: name, level, index, progress?, total?)
 │   ├── Timeline.tsx         # Timeline vertikal; mode scrub via prop progress?: MotionValue (props: items, progress?, total?)
 │   ├── SectionHeading.tsx   # Heading section dengan masked reveal
-│   ├── Marquee.tsx          # Pita teknologi, kecepatan ikut scroll velocity
+│   ├── Marquee.tsx          # Pita teknologi, kecepatan konstan 32 detik
 │   ├── AnimatedSection.tsx  # Fade-in scroll wrapper (props: delay?)
 │   ├── ThemeToggle.tsx      # Tombol dark/light mode
+│   ├── LangToggle.tsx       # Toggle bahasa ID/EN (mono, di navbar)
+│   ├── ProjectsBody.tsx     # Isi /projects (klien, demi useLang); page.tsx server hanya metadata
 │   ├── LoadingScreen.tsx    # Loader animasi di awal
 │   ├── TypingEffect.tsx     # Efek ketik otomatis
 │   ├── SocialLinks.tsx      # Ikon sosial media bersama
@@ -84,7 +87,7 @@ src/
 │   ├── ScrollProgress.tsx   # Progress bar atas (spring halus)
 │   ├── StatCounter.tsx      # Animated stat counter (props: items[])
 │   ├── InstallPrompt.tsx    # Prompt install PWA
-│   └── VisitorCounter.tsx   # Visitor counter via countapi.xyz
+│   └── VisitorCounter.tsx   # Visitor counter via Abacus
 ├── content/
 │   ├── personal.ts          # Data personal, skills, timeline, social, stats
 │   └── projects.ts          # Data proyek + interface Project
@@ -155,7 +158,7 @@ Ada 6 proyek. Untuk gambar sementara pakai placeholder `/project-1.jpg` s/d `/pr
 - Deploy: local → GitHub → Vercel + Cloudflare
 - Kontak memakai `mailto:` (tidak pakai Formspree)
 - Smooth scroll Lenis: `autoRaf: true`, touch native; disabled saat `prefers-reduced-motion`; modal bisa pause via `stopSmoothScroll()`/`startSmoothScroll()`
-- Custom cursor: hanya aktif pointer fine + non-reduced-motion; label via atribut `data-cursor`
+- Pointer Normal+: kursor bawaan TIDAK disembunyikan; ring aksen hanya aktif pointer fine + non-reduced-motion; hover interaktif dideteksi via `a, button, [data-cursor], [role="button"]` (atribut `data-cursor` kini hanya penanda interaktif, labelnya sudah tidak ada)
 - Page transition: `document.startViewTransition` (Chromium); fallback navigasi biasa di browser lain; hash link tetap milik Lenis
 - Sosial media: handle `syamsulsariphidayat7`
 - `AboutCode.tsx` tidak dipakai

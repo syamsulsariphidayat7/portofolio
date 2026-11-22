@@ -25,7 +25,7 @@ const PARTICLE_COUNT = 50;
 const CONNECTION_DIST = 125;
 const SYMBOLS = ["</>", "{}", "()", "[]", "=>", "/*", "//", "const", "let", "fn"];
 const MOUSE_DIST = 170;
-const MAX_SPEED = 1.6;
+const MAX_SPEED = 0.8;
 
 export function NetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -50,8 +50,8 @@ export function NetworkBackground() {
       () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.55,
-        vy: (Math.random() - 0.5) * 0.55,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: (Math.random() - 0.5) * 0.28,
         size: Math.random() * 2 + 1.5,
         alpha: Math.random() * 0.5 + 0.3,
       }),

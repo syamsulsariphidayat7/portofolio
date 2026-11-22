@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useProjectText } from "@/lib/i18n";
 import {
   motion,
   useMotionValue,
@@ -19,6 +20,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, index }: ProjectCardProps) {
+  const text = useProjectText(project);
   const cardRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
 
@@ -89,7 +91,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={project.image}
-                alt={project.title}
+                alt={text.title}
                 loading="lazy"
                 className="h-full w-full scale-110 object-cover transition-transform duration-700 group-hover:scale-[1.18]"
               />
@@ -115,7 +117,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Demo ${project.title}`}
+                aria-label={`Demo ${text.title}`}
                 className="grid h-9 w-9 place-items-center rounded-xl border border-white/20 bg-white/15 text-white backdrop-blur-md transition-colors hover:bg-primary-500"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -145,7 +147,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
             {project.title}
           </h3>
           <p className="mt-2 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">
-            {project.description}
+            {text.description}
           </p>
           <div className="mb-5 mt-4 flex flex-wrap gap-2">
             {project.tags.map((tag) => (

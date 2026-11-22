@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   motion,
   AnimatePresence,
@@ -15,9 +15,9 @@ import { KineticText } from "./KineticText";
 import { HeroTerminal } from "./HeroTerminal";
 import { SocialLinks } from "./SocialLinks";
 import { Magnetic } from "./Magnetic";
-import { HudFrame } from "./HudFrame";
-import { GlitchText } from "./GlitchText";
 import { HologramGlobe } from "./HologramGlobe";
+import { bootSignal } from "@/lib/bootSignal";
+import { useLang } from "@/lib/i18n";
 import dynamic from "next/dynamic";
 
 /* WebGL 3D di-code-split: tidak menghalangi render awal halaman */
@@ -25,34 +25,33 @@ const Starfield3D = dynamic(() => import("./Starfield3D").then((m) => m.Starfiel
 import { personal } from "@/content/personal";
 
 function useRotatingRole() {
+  const { t } = useLang();
   const [index, setIndex] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setIndex((i) => (i + 1) % personal.roles.length), 2600);
+    const id = setInterval(() => setIndex((i) => (i + 1) % t.hero.roles.length), 2600);
     return () => clearInterval(id);
-  }, []);
-  return personal.roles[index];
-}
-
-function useUptime() {
-  const [uptime, setUptime] = useState("00:00:00");
-  useEffect(() => {
-    const start = Date.now();
-    const id = setInterval(() => {
-      const s = Math.floor((Date.now() - start) / 1000);
-      const hh = String(Math.floor(s / 3600)).padStart(2, "0");
-      const mm = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
-      const ss = String(s % 60).padStart(2, "0");
-      setUptime(`${hh}:${mm}:${ss}`);
-    }, 1000);
-    return () => clearInterval(id);
-  }, []);
-  return uptime;
+  }, [t]);
+  return t.hero.roles[index % t.hero.roles.length];
 }
 
 export function HeroSection() {
+  const { t } = useLang();
   const role = useRotatingRole();
-  const uptime = useUptime();
   const reduce = useReducedMotion();
+  /* Gerbang boot: animasi masuk hero menunggu sinyal LoadingScreen
+     (bootSignal) supaya tidak habis di balik layar boot. Fallback 5 dtk
+     untuk berjaga bila sinyal tak pernah datang. */
+  const booted = useSyncExternalStore(
+    bootSignal.subscribe,
+    bootSignal.isDone,
+    () => false,
+  );
+  const [bootFallback, setBootFallback] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setBootFallback(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
+  const heroIn = booted || bootFallback;
   const sectionRef = useRef<HTMLElement>(null);
 
   /* ---- Parallax kursor (kedalaman berlapis) ---- */
@@ -67,8 +66,6 @@ export function HeroSection() {
   const cardY = useTransform(smy, (v) => v * 12);
   const chipX = useTransform(smx, (v) => v * 30);
   const chipY = useTransform(smy, (v) => v * 22);
-  const codeX = useTransform(smx, (v) => v * -24);
-  const codeY = useTransform(smy, (v) => v * -18);
 
   function onMouseMove(e: React.MouseEvent) {
     const el = sectionRef.current;
@@ -100,7 +97,10 @@ export function HeroSection() {
       className="relative flex min-h-screen items-center overflow-hidden"
     >
       {/* WebGL 3D: partikel bintang + core wireframe (di belakang semua) */}
-      <Starfield3D className="z-0 opacity-95 dark:opacity-100 [mask-image:radial-gradient(ellipse_78%_72%_at_60%_42%,black_32%,transparent_82%)]" />
+      <Starfield3D
+        corePosition={[0, 0.5, -3.5]}
+        className="z-0 opacity-95 dark:opacity-100 [mask-image:radial-gradient(ellipse_78%_72%_at_50%_45%,black_32%,transparent_82%)]"
+      />
 
       {/* Shooting star */}
       <div aria-hidden="true" className="shooting-star" />
@@ -120,18 +120,18 @@ export function HeroSection() {
         <div className="animate-float pointer-events-none absolute -bottom-32 -right-32 h-[26rem] w-[26rem] rounded-full bg-indigo-400/15 blur-3xl dark:bg-indigo-500/10" />
       </motion.div>
 
-      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-16 px-4 pb-24 pt-32 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="relative mx-auto grid w-full max-w-[90rem] items-center gap-16 px-4 pb-24 pt-32 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
         {/* ===== KIRI: teks ===== */}
         <motion.div style={reduceStyle ?? { y: textY, opacity: textOpacity }}>
           <motion.div
             initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={heroIn ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
             transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             {/* Badge status terminal */}
             <motion.span
               initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={heroIn ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               transition={{ delay: 0.1, duration: 0.5 }}
               className="inline-flex items-center gap-1.5 rounded-md border border-primary-500/30 bg-slate-950/5 px-3 py-1.5 font-mono text-[11px] font-medium tracking-wide text-primary-700 dark:bg-primary-500/10 dark:text-primary-300"
             >
@@ -149,7 +149,7 @@ export function HeroSection() {
 
             <h1 className="mb-4 mt-5 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
               {/* Kinetic typography: berat kata mengikuti kursor + scroll */}
-              <KineticText text={`Hai, saya ${personal.name}`} className="text-gradient-animate" />
+              <KineticText text={`${t.hero.greeting} ${personal.name}`} className="text-gradient-animate" />
             </h1>
 
             {/* Role berputar */}
@@ -178,24 +178,28 @@ export function HeroSection() {
               </p>
             </div>
 
+            {/* Timing tangga rapat (dirapikan 22 Nov 2026): delay lama
+                2.2/2.4/2.6 adalah sisa era judul efek-mengetik — judul
+                sekarang instan (KineticText), jadi elemen di bawahnya
+                tidak perlu menunggu ±2 detik. */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.2, duration: 0.6 }}
+              animate={heroIn ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ delay: 0.35, duration: 0.6 }}
               className="mb-9 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-400"
             >
-              {personal.bio}
+              {t.hero.bio}
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.4, duration: 0.6 }}
+              animate={heroIn ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
               className="mb-8 flex flex-wrap items-center gap-4"
             >
               <Magnetic strength={0.18}>
                 <Button href="#work">
-                  Lihat Proyek
+                  {t.hero.viewProjects}
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
@@ -203,92 +207,63 @@ export function HeroSection() {
               </Magnetic>
               <Magnetic strength={0.18}>
                 <Button href="#contact" variant="outline">
-                  Hubungi Saya
+                  {t.hero.contactMe}
                 </Button>
               </Magnetic>
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.6, duration: 0.6 }}
+              animate={heroIn ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ delay: 0.65, duration: 0.6 }}
               className="flex items-center gap-3"
             >
-              <span className="font-mono text-xs text-slate-400">ikuti saya:</span>
+              <span className="font-mono text-xs text-slate-400">{t.hero.follow}</span>
               <SocialLinks />
             </motion.div>
           </motion.div>
         </motion.div>
 
-        {/* ===== KANAN: visual avatar ===== */}
+        {/* ===== KANAN: visual avatar — GESER kiri di dalam kolomnya
+            (22 Nov 2026: rata tepi kiri kolom, BUKAN pindah sisi;
+            globe Starfield kini di tengah hero) ===== */}
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.9, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="relative mx-auto hidden w-full max-w-sm md:block lg:max-w-md"
+          animate={heroIn ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.92 }}
+          transition={{ delay: 0.7, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="relative mx-auto hidden w-full max-w-sm md:block lg:mx-0 lg:max-w-md"
         >
           {/* Parallax scroll: visual melayang lebih lambat + mengecil halus */}
           <motion.div style={reduceVisual ?? { y: visualY, scale: visualScale }} className="relative">
-            {/* Halo + cincin berputar */}
+            {/* Halo lembut (dipertahankan) */}
             <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-tr from-primary-500/25 via-teal-400/15 to-indigo-500/20 blur-2xl" />
-            <motion.div style={{ x: glowX, y: glowY }}>
-              <div aria-hidden="true" className="pointer-events-none absolute -inset-12 rounded-full border border-primary-500/15" />
-              <div aria-hidden="true" className="pointer-events-none absolute -inset-24 rounded-full border border-primary-500/10" />
-              <div aria-hidden="true" className="animate-radar pointer-events-none absolute -inset-12 rounded-full bg-[conic-gradient(from_0deg,rgba(45,212,191,0.28),transparent_70deg)]" />
+
+            {/* Bingkai HUD tenang (rombakan 22 Nov 2026, pilihan Syamsul
+                "Varian A"): radar conic + aura muter + dua cincin lingkaran
+                DIBUANG — bentuk lingkaran memaksa pada terminal persegi dan
+                dua putaran bersamaan terasa seperti kipas. Gantinya ring
+                persegi tipis mengikuti bentuk terminal + 4 bracket sudut
+                berdenyut sangat pelan (4 dtk, bergeser fase per sudut). */}
+            <motion.div style={{ x: glowX, y: glowY }} aria-hidden="true" className="pointer-events-none absolute inset-0">
+              <div className="absolute -inset-3 rounded-[1.9rem] border border-primary-500/20" />
+              <div className="absolute -inset-5">
+                <span className="animate-bracket-pulse absolute left-0 top-0 h-6 w-6 rounded-tl-[1.1rem] border-l-2 border-t-2 border-primary-400/70" />
+                <span className="animate-bracket-pulse absolute right-0 top-0 h-6 w-6 rounded-tr-[1.1rem] border-r-2 border-t-2 border-primary-400/70" style={{ animationDelay: "1s" }} />
+                <span className="animate-bracket-pulse absolute bottom-0 left-0 h-6 w-6 rounded-bl-[1.1rem] border-b-2 border-l-2 border-primary-400/70" style={{ animationDelay: "2s" }} />
+                <span className="animate-bracket-pulse absolute bottom-0 right-0 h-6 w-6 rounded-br-[1.1rem] border-b-2 border-r-2 border-primary-400/70" style={{ animationDelay: "3s" }} />
+              </div>
             </motion.div>
 
-            {/* Energy aura berputar */}
-            <div
-              aria-hidden="true"
-              className="animate-spin-slow pointer-events-none absolute -inset-3 rounded-[2.4rem] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(45,212,191,0.4)_80deg,transparent_160deg,rgba(129,140,248,0.4)_250deg,transparent_330deg)] opacity-70 blur-xl"
-            />
-
-            {/* Kartu avatar dengan HUD frame */}
-            <HudFrame label="PROFILE // 0x01" className="px-4 pt-4">
-              <motion.div
-                style={{ x: cardX, y: cardY }}
-                className="relative rounded-[2rem] bg-gradient-to-br from-primary-500 via-teal-400 to-indigo-500 p-[2px] shadow-2xl shadow-primary-500/20"
-              >
-                <motion.div
-                  animate={reduce ? undefined : { y: [0, -8, 0] }}
-                  transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-                  className="overflow-hidden rounded-[calc(2rem-2px)] bg-white dark:bg-slate-900"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={personal.avatar}
-                    alt={`Foto ${personal.name}`}
-                    className="aspect-[4/5] w-full object-cover"
-                  />
-                </motion.div>
-
-                {/* Readout status */}
-                <div className="glass absolute inset-x-4 bottom-4 rounded-2xl px-4 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        <GlitchText text={personal.name} className="text-slate-900 dark:text-slate-100" />
-                        <span className="font-mono text-xs text-primary-500">_0x01</span>
-                      </p>
-                      <p className="truncate font-mono text-[11px] uppercase tracking-wider text-primary-600 dark:text-primary-400">
-                        {personal.role}
-                      </p>
-                    </div>
-                    <span className="flex shrink-0 items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 font-mono text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60" />
-                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      </span>
-                      ONLINE
-                    </span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between border-t border-slate-200/70 pt-1.5 font-mono text-[10px] text-slate-400 dark:border-slate-700/60">
-                    <span>UPTIME {uptime}</span>
-                    <span>6.2°S 106.8°E</span>
-                  </div>
-                </div>
-              </motion.div>
-            </HudFrame>
+            {/* Visual utama: TERMINAL (menggantikan kartu avatar —
+                keputusan Syamsul 22 Nov 2026: kartu dihapus total,
+                chip teknologi + globe kecil tetap melayang di sekitar
+                terminal; identitas tetap terbaca dari skrip terminal) */}
+            <motion.div style={{ x: cardX, y: cardY }} className="relative">
+              <HeroTerminal
+                size="lg"
+                className="animate-float-delayed glass relative w-full rounded-[1.5rem] shadow-2xl shadow-primary-500/20"
+              />
+            </motion.div>
 
             {/* Globe hologram kecil — bisa di-drag dengan mouse/touch */}
             <motion.div style={{ x: chipX, y: chipY }} className="absolute -top-14 right-0 z-10 lg:-right-3">
@@ -300,27 +275,32 @@ export function HeroSection() {
               </div>
             </motion.div>
 
-            {/* Chip teknologi mengambang (parallax kursor, float via CSS) */}
-            <motion.div style={{ x: chipX, y: chipY }}>
+            {/* Chip teknologi mengambang (parallax kursor, float via CSS).
+                PERBAIKAN BUG POSISI (22 Nov 2026): pembungkus chip WAJIB
+                will-change-transform. Tanpa itu, saat boot (x/y masih 0)
+                framer-motion merender transform: none sehingga chip
+                absolute di dalamnya berlabuh ke kolom visual (menimpa
+                terminal); begitu mouse bergerak transform muncul,
+                pembungkus jadi containing block, dan chip melompat ke
+                posisi semestinya di bawah-kiri terminal. will-change
+                membuat pembungkus containing block sejak frame pertama,
+                jadi posisi boot = posisi setelah mouse bergerak. */}
+            <motion.div style={{ x: chipX, y: chipY }} className="will-change-transform">
               <div className="animate-float glass absolute -left-5 top-10 rounded-full px-3.5 py-1.5 font-mono text-xs text-slate-700 shadow-lg shadow-slate-900/5 dark:text-slate-200">
                 ⚡ Next.js
               </div>
             </motion.div>
-            <motion.div style={{ x: chipX, y: chipY }}>
+            <motion.div style={{ x: chipX, y: chipY }} className="will-change-transform">
               <div className="animate-float-delayed glass absolute -left-8 top-1/3 rounded-full px-3.5 py-1.5 font-mono text-xs text-slate-700 shadow-lg shadow-slate-900/5 dark:text-slate-200">
                 {"{ TS }"}
               </div>
             </motion.div>
-            <motion.div style={{ x: chipX, y: chipY }}>
+            <motion.div style={{ x: chipX, y: chipY }} className="will-change-transform">
               <div className="animate-float glass absolute -bottom-6 right-6 rounded-full px-3.5 py-1.5 font-mono text-xs text-slate-700 shadow-lg shadow-slate-900/5 dark:text-slate-200">
                 Tailwind
               </div>
             </motion.div>
 
-            {/* Terminal kode mengetik sendiri (parallax berlawanan arah) */}
-            <motion.div style={{ x: codeX, y: codeY }}>
-              <HeroTerminal className="animate-float-delayed glass absolute -bottom-10 -left-10 hidden w-64 rounded-2xl shadow-2xl shadow-slate-900/5 sm:block" />
-            </motion.div>
           </motion.div>
         </motion.div>
       </div>
@@ -330,8 +310,8 @@ export function HeroSection() {
         <motion.a
           href="#work"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 3, duration: 1 }}
+          animate={{ opacity: heroIn ? 1 : 0 }}
+          transition={{ delay: 1.2, duration: 1 }}
           className="flex flex-col items-center gap-2 text-slate-400"
           aria-label="Scroll ke karya"
         >

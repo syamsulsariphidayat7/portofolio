@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { personal } from "@/content/personal";
 import { VisitorCounter } from "./VisitorCounter";
@@ -5,15 +7,17 @@ import { SocialLinks } from "./SocialLinks";
 import { Magnetic } from "./Magnetic";
 import { DecryptText } from "./DecryptText";
 import { Button } from "./ui/Button";
+import { useLang, type Dict } from "@/lib/i18n";
 
 const QUICK_LINKS = [
-  { href: "/#work", label: "Karya" },
-  { href: "/#about", label: "Tentang" },
-  { href: "/projects", label: "Proyek" },
-  { href: "/#contact", label: "Kontak" },
+  { href: "/#work", labelKey: "featured" as keyof Dict["nav"] },
+  { href: "/#about", labelKey: "about" as keyof Dict["nav"] },
+  { href: "/projects", labelKey: "projects" as keyof Dict["nav"] },
+  { href: "/#contact", labelKey: "contact" as keyof Dict["nav"] },
 ];
 
 export function Footer() {
+  const { t } = useLang();
   return (
     <footer className="relative z-10 overflow-hidden border-t border-slate-200 dark:border-slate-800">
       <div
@@ -33,20 +37,19 @@ export function Footer() {
           <span className="text-primary-500">]</span>
         </p>
         <h2 className="mt-6 text-4xl font-bold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl lg:text-7xl dark:text-slate-100">
-          <DecryptText text="ADA PROYEK?" />
+          <DecryptText text={t.footer.finaleQ} />
           <br />
-          <span className="text-gradient">AYO NGOMONG.</span>
+          <span className="text-gradient">{t.footer.finaleTalk}</span>
         </h2>
         <p className="mt-6 max-w-md leading-relaxed text-slate-500 dark:text-slate-400">
-          Jangan ragu kirim pesan — saya selalu terbuka untuk kolaborasi, ide, atau
-          sekadar obrolan ringan.
+          {t.footer.finaleBody}
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
           <Magnetic strength={0.2}>
             <Button
-              href={`mailto:${personal.email}?subject=${encodeURIComponent("Halo Syamsul — dari portofolio")}`}
+              href={`mailto:${personal.email}?subject=${encodeURIComponent(t.contact.subject)}`}
             >
-              Mulai Percakapan
+              {t.footer.startChat}
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
@@ -68,7 +71,7 @@ export function Footer() {
       <div className="border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-slate-500 sm:flex-row sm:px-6 dark:text-slate-400">
           <p>
-            &copy; {new Date().getFullYear()} {personal.name}. Hak cipta dilindungi.
+            &copy; {new Date().getFullYear()} {personal.name}. {t.footer.rights}
           </p>
           <nav className="flex items-center gap-4">
             {QUICK_LINKS.map((l) => (
@@ -77,7 +80,7 @@ export function Footer() {
                 href={l.href}
                 className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
               >
-                {l.label}
+                {t.nav[l.labelKey]}
               </Link>
             ))}
           </nav>

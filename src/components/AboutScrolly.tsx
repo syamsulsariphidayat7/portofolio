@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import { SkillBar } from "./SkillBar";
 import { Timeline } from "./Timeline";
 import { personal } from "@/content/personal";
+import { useLang } from "@/lib/i18n";
 
 /**
  * Scrollytelling "Tentang": skill bar terisi & timeline menyala mengikuti
@@ -12,6 +13,7 @@ import { personal } from "@/content/personal";
  * saat prefers-reduced-motion.
  */
 export function AboutScrolly() {
+  const { t } = useLang();
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
@@ -30,10 +32,10 @@ export function AboutScrolly() {
       <div>
         <div className="mb-6 flex items-center justify-between">
           <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Keahlian
+            {t.about.skills}
           </h3>
           <span className="font-mono text-xs text-slate-400">
-            {personal.skills.length} teknologi
+            {personal.skills.length} {t.about.technologies}
           </span>
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
@@ -52,10 +54,10 @@ export function AboutScrolly() {
 
       <div>
         <h3 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">
-          Pengalaman
+          {t.about.experience}
         </h3>
         <Timeline
-          items={personal.timeline}
+          items={personal.timeline.map((item, i) => ({ ...item, ...t.data.timeline[i] }))}
           progress={scrubbed}
           total={personal.timeline.length}
         />

@@ -1,151 +1,80 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useMotionTemplate,
-  useReducedMotion,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "./ui/Badge";
 import { stopSmoothScroll, startSmoothScroll } from "./SmoothScroll";
 import { projects, type Project } from "@/content/projects";
+import { useLang, useProjectText } from "@/lib/i18n";
 
 const total = projects.length;
 
 /* ------------------------------------------------------------------ */
-/* Kartu deck: fan + tilt 3D mengikuti mouse + shadow dinamis + edge-  */
-/* light pada sisi yang menghadap kursor                                */
+/* Baris index: satu proyek satu baris — nomor, thumbnail, judul,     */
+/* ringkasan, tag, panah. Menggantikan deck kipas (22 Nov 2026 atas   */
+/* pilihan Syamsul): daftar harus bisa di-scan sekilas, tanpa tilt    */
+/* 3D dan tanpa kartu bertumpuk. Klik baris membuka modal detail.     */
 /* ------------------------------------------------------------------ */
-function DeckCard({
+function IndexRow({
   project,
   i,
-  fan,
   onOpen,
 }: {
   project: Project;
   i: number;
-  fan: number;
   onOpen: () => void;
 }) {
-  const reduce = useReducedMotion();
-
-  const tiltX = useMotionValue(0);
-  const tiltY = useMotionValue(0);
-  const sTiltX = useSpring(tiltX, { stiffness: 220, damping: 26, mass: 0.5 });
-  const sTiltY = useSpring(tiltY, { stiffness: 220, damping: 26, mass: 0.5 });
-
-  /* Shadow dinamis: offset berlawanan arah tilt + makin pekat saat miring */
-  const shadowX = useTransform(sTiltY, (v) => -v * 1.7);
-  const shadowY = useTransform(sTiltX, (v) => v * 1.7 + 16);
-  const shadowBlur = useTransform(
-    [sTiltX, sTiltY],
-    ([a, b]: number[]) => 26 + (Math.abs(a) + Math.abs(b)) * 1.3
-  );
-  const shadowOpacity = useTransform(
-    [sTiltX, sTiltY],
-    ([a, b]: number[]) => 0.07 + ((Math.abs(a) + Math.abs(b)) / 14) * 0.22
-  );
-  const cardShadow = useMotionTemplate`${shadowX}px ${shadowY}px ${shadowBlur}px -4px rgba(2,6,23,${shadowOpacity})`;
-
-  /* Edge-light: sisi yang menghadap kursor menyala (kanan saat tiltY>0) */
-  const rightGlow = useTransform(sTiltY, [0, 8], [0, 1]);
-  const leftGlow = useTransform(sTiltY, [-8, 0], [1, 0]);
-
-  function onMove(e: React.MouseEvent) {
-    if (reduce) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    tiltY.set(px * 10);
-    tiltX.set(-py * 8);
-  }
-  function onLeave() {
-    tiltX.set(0);
-    tiltY.set(0);
-  }
-
+  const text = useProjectText(project);
   return (
     <motion.button
       type="button"
       onClick={onOpen}
       data-cursor="OPEN"
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      initial={{ opacity: 0, y: 44 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, delay: i * 0.06 }}
-      whileHover={{ y: -12, rotate: 0, scale: 1.03 }}
-      style={{
-        rotate: fan,
-        rotateX: reduce ? 0 : sTiltX,
-        rotateY: reduce ? 0 : sTiltY,
-        transformPerspective: 1000,
-        boxShadow: cardShadow,
-      }}
-      className={`group relative w-[min(86vw,22rem)] shrink-0 snap-center overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition-colors duration-300 hover:z-20 hover:border-primary-500/40 lg:w-72 dark:border-slate-800 dark:bg-slate-900 ${
-        i === 0 ? "" : "lg:-ml-32"
-      }`}
+      transition={{ duration: 0.45, delay: i * 0.05 }}
+      className="group flex w-full items-center gap-4 px-4 py-4 text-left transition-colors duration-200 hover:bg-primary-500/5 sm:gap-6 sm:px-6"
     >
-      <div className="relative aspect-[16/10] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={project.image}
-          alt={project.title}
-          loading="lazy"
-          className="h-full w-full scale-110 object-cover transition-transform duration-700 group-hover:scale-125"
-        />
-        {/* Duotone split saat hover (cyan/magenta chromatic aberration) */}
-        <div
-          aria-hidden="true"
-          className="duotone absolute inset-0"
-          style={{ "--duotone-img": `url(${project.image})` } as React.CSSProperties}
-        />
-        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent" />
-        <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-md border border-primary-400/30 bg-slate-950/60 px-2 py-1 font-mono text-[10px] tracking-wider text-primary-300 backdrop-blur-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]" />
-          PRJ-{String(i + 1).padStart(2, "0")}
-        </span>
-        <span className="absolute bottom-3 left-3 font-mono text-xs tracking-widest text-white/80">
-          0{i + 1} / 0{total}
-        </span>
-      </div>
-      <div className="flex items-center justify-between gap-3 p-4">
-        <div className="min-w-0">
-          <h3 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
-            {project.title}
-          </h3>
-          <p className="mt-0.5 truncate font-mono text-[11px] text-slate-400">
-            {project.tags.slice(0, 3).join(" · ")}
-          </p>
-        </div>
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary-500/30 text-primary-500 transition-transform duration-300 group-hover:rotate-45">
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-          </svg>
-        </span>
-      </div>
+      <span className="w-8 shrink-0 font-mono text-sm font-medium text-primary-500">
+        {String(i + 1).padStart(2, "0")}
+      </span>
 
-      {/* Edge-light: sisi yang menghadap kursor menyala */}
-      <motion.div
-        aria-hidden="true"
-        style={{ opacity: reduce ? 0 : rightGlow }}
-        className="pointer-events-none absolute inset-y-1 right-0 z-20 w-[3px] rounded-full bg-gradient-to-b from-transparent via-primary-300/90 to-transparent shadow-[0_0_12px_2px_rgba(45,212,191,0.4)]"
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={project.image}
+        alt=""
+        loading="lazy"
+        className="h-12 w-[4.5rem] shrink-0 rounded-lg object-cover sm:h-14 sm:w-24"
       />
-      <motion.div
-        aria-hidden="true"
-        style={{ opacity: reduce ? 0 : leftGlow }}
-        className="pointer-events-none absolute inset-y-1 left-0 z-20 w-[3px] rounded-full bg-gradient-to-b from-transparent via-primary-300/90 to-transparent shadow-[0_0_12px_2px_rgba(45,212,191,0.4)]"
-      />
+
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-base font-semibold text-slate-900 transition-colors group-hover:text-primary-500 dark:text-slate-100">
+          {text.title}
+        </span>
+        <span className="mt-0.5 block truncate text-sm text-slate-500 dark:text-slate-400">
+          {text.description}
+        </span>
+        <span className="mt-1 block truncate font-mono text-[11px] tracking-wide text-slate-400">
+          {project.tags.slice(0, 4).join(" · ")}
+        </span>
+      </span>
+
+      <span className="hidden shrink-0 font-mono text-[11px] tracking-widest text-slate-400 md:block">
+        PRJ-{String(i + 1).padStart(2, "0")}
+      </span>
+
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-primary-500/30 text-primary-500 transition-transform duration-300 group-hover:rotate-45">
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+        </svg>
+      </span>
     </motion.button>
   );
 }
 
-export function ProjectDeck() {
+export function ProjectIndex() {
+  const { t } = useLang();
   const [open, setOpen] = useState<number | null>(null);
 
   const close = () => setOpen(null);
@@ -166,29 +95,34 @@ export function ProjectDeck() {
       window.removeEventListener("keydown", onKey);
       startSmoothScroll();
     };
-  }, [open]);
+  }, [open ]);
 
   const active = open !== null ? projects[open] : null;
+  const activeText = useProjectText(active ?? projects[0]);
 
   return (
     <>
-      {/* Deck: fan kartu (desktop) / snap carousel (mobile & md) */}
-      <div className="flex snap-x snap-mandatory gap-6 overflow-x-auto pb-4 pt-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:gap-0 lg:overflow-visible lg:pb-0">
-        {projects.map((project, i) => {
-          const fan = (i - (total - 1) / 2) * 2.4;
-          return (
-            <DeckCard
-              key={project.id}
-              project={project}
-              i={i}
-              fan={fan}
-              onOpen={() => setOpen(i)}
-            />
-          );
-        })}
+      {/* Kepala index */}
+      <div className="flex items-center justify-between px-1 pb-3 font-mono text-[11px] uppercase tracking-[0.22em] text-slate-400">
+        <span>{t.projectsPage.indexHead}</span>
+        <span>
+          {String(total).padStart(2, "0")} {t.projectsPage.items}
+        </span>
       </div>
 
-      {/* Modal work index */}
+      {/* List baris */}
+      <div className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white/60 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/40">
+        {projects.map((project, i) => (
+          <IndexRow
+            key={project.id}
+            project={project}
+            i={i}
+            onOpen={() => setOpen(i)}
+          />
+        ))}
+      </div>
+
+      {/* Modal detail proyek */}
       <AnimatePresence>
         {active && open !== null && (
           <motion.div
@@ -240,7 +174,7 @@ export function ProjectDeck() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={active.image}
-                    alt={active.title}
+                    alt={activeText.title}
                     className="h-full w-full object-cover"
                   />
                   <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
@@ -250,10 +184,10 @@ export function ProjectDeck() {
                 </div>
                 <div className="p-6">
                   <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                    {active.title}
+                    {activeText.title}
                   </h3>
                   <p className="mt-2 leading-relaxed text-slate-600 dark:text-slate-400">
-                    {active.description}
+                    {activeText.description}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {active.tags.map((tag) => (
@@ -268,7 +202,7 @@ export function ProjectDeck() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-teal-500 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-primary-500/25 transition-shadow hover:shadow-primary-500/40"
                       >
-                        Buka Demo
+                        {t.projectsPage.demo}
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                         </svg>
@@ -281,7 +215,7 @@ export function ProjectDeck() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:border-primary-500/40 hover:text-primary-600 dark:border-slate-700 dark:text-slate-300 dark:hover:text-primary-300"
                       >
-                        Lihat Kode
+                        {t.projectsPage.code}
                       </a>
                     )}
                   </div>

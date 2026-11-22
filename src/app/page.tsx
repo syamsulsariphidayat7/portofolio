@@ -1,3 +1,5 @@
+"use client";
+
 import { HeroSection } from "@/components/HeroSection";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { SectionHeading } from "@/components/SectionHeading";
@@ -19,6 +21,7 @@ import { RevealText } from "@/components/RevealText";
 import { Button } from "@/components/ui/Button";
 import { SocialLinks } from "@/components/SocialLinks";
 import { personal } from "@/content/personal";
+import { useLang } from "@/lib/i18n";
 
 const marqueeItems = [
   "Next.js",
@@ -167,6 +170,7 @@ const contactInfo = [
 
 
 export default function Home() {
+  const { t } = useLang();
   return (
     <>
       <HeroSection />
@@ -186,21 +190,21 @@ export default function Home() {
         <Parallax speed={-70} rotate={-40} className="pointer-events-none absolute -left-8 bottom-28 hidden opacity-50 md:block">
           <Float3D variant="cube" size={76} />
         </Parallax>
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
+        <div className="w-full px-[6vw] py-20 lg:py-28">
           <AnimatedSection>
             <SectionHeading
-              eyebrow="// layanan"
+              eyebrow={t.services.eyebrow}
               title={
                 <>
-                  Yang Saya <span className="text-gradient">Kerjakan</span>
+                  {t.services.titleA} <span className="text-gradient">{t.services.titleB}</span>
                 </>
               }
-              description="Dari ide hingga produksi — saya membantu membangun produk digital yang berdampak."
+              description={t.services.desc}
             />
           </AnimatedSection>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {services.map((service, i) => (
-              <AnimatedSection key={service.title} delay={i * 0.08} className="h-full">
+              <AnimatedSection key={t.services.items[i].title} delay={i * 0.08} className="h-full">
                 <TiltCard
                   intensity={6}
                   className="group h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/70 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary-500/40 hover:shadow-xl hover:shadow-primary-500/10 dark:border-slate-800 dark:bg-slate-900/50"
@@ -213,7 +217,7 @@ export default function Home() {
                     {service.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                    {service.description}
+                    {t.services.items[i].description}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-1.5">
                     {service.tags.map((tag) => (
@@ -241,16 +245,16 @@ export default function Home() {
         <Parallax speed={-60} rotate={-45} className="pointer-events-none absolute right-[12%] bottom-16 hidden opacity-45 lg:block">
           <Float3D variant="rings" size={70} />
         </Parallax>
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
+        <div className="w-full px-[6vw] py-20 lg:py-28">
           <AnimatedSection>
             <SectionHeading
-              eyebrow="// tentang"
+              eyebrow={t.about.eyebrow}
               title={
                 <>
-                  Tentang <span className="text-gradient">Saya</span>
+                  {t.about.titleA} <span className="text-gradient">{t.about.titleB}</span>
                 </>
               }
-              description={personal.bio}
+              description={t.hero.bio}
               align="left"
             />
           </AnimatedSection>
@@ -275,14 +279,14 @@ export default function Home() {
             className="animate-spin-slow h-full w-full rounded-full border border-dashed border-primary-500/15"
           />
         </Parallax>
-        <div className="relative z-[1] mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="relative z-[1] w-full px-[6vw] py-16">
           <AnimatedSection>
             <p className="mb-8 text-center font-mono text-[11px] tracking-[0.3em] text-slate-400">
               <span className="text-primary-500">[</span> SYSTEM.DATA{" "}
               <span className="text-primary-500">{"//"}</span> REAL-TIME{" "}
               <span className="text-primary-500">]</span>
             </p>
-            <StatCounter items={personal.stats} />
+            <StatCounter items={personal.stats.map((s, i) => ({ ...s, label: t.data.statsLabels[i] }))} />
           </AnimatedSection>
         </div>
       </section>
@@ -297,16 +301,16 @@ export default function Home() {
         <Parallax speed={120} rotate={-50} className="pointer-events-none absolute bottom-24 left-[6%] hidden opacity-40 md:block">
           <Float3D variant="cube" size={56} />
         </Parallax>
-        <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
+        <div className="w-full px-[6vw] py-20 lg:py-28">
           <AnimatedSection>
             <SectionHeading
-              eyebrow="// kontak"
+              eyebrow={t.contact.eyebrow}
               title={
                 <>
-                  Hubungi <span className="text-gradient">Saya</span>
+                  {t.contact.titleA} <span className="text-gradient">{t.contact.titleB}</span>
                 </>
               }
-              description="Ada proyek menarik atau ingin berkolaborasi? Saya selalu terbuka untuk obrolan."
+              description={t.contact.desc}
             />
           </AnimatedSection>
 
@@ -324,17 +328,14 @@ export default function Home() {
                       <span className="animate-blink text-white">▌</span>
                     </p>
                   <h3 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
-                    <RevealText text="Punya ide menarik? Mari wujudkan bersama." />
+                    <RevealText text={t.contact.ctaTitle} />
                   </h3>
                 <p className="mt-4 max-w-md leading-relaxed text-primary-50/90">
-                  Jangan ragu untuk menyapa — saya biasanya membalas dalam 1x24 jam. Setiap proyek
-                  dimulai dari percakapan sederhana.
+                  {t.contact.ctaBody}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Button
-                    href={`mailto:${personal.email}?subject=${encodeURIComponent(
-                      "Halo Syamsul — dari portofolio",
-                    )}`}
+                    href={`mailto:${personal.email}?subject=${encodeURIComponent(t.contact.subject)}`}
                     variant="light"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -344,7 +345,7 @@ export default function Home() {
                         d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
                       />
                     </svg>
-                    Kirim Email
+                    {t.contact.sendEmail}
                   </Button>
                   <Button
                     href={`https://wa.me/${personal.phone.replace(/^0/, "62")}`}
@@ -370,7 +371,7 @@ export default function Home() {
                       {info.icon}
                     </div>
                     <p className="mt-3 text-xs font-medium uppercase tracking-wider text-slate-400">
-                      {info.label}
+                      {i === 2 ? t.contact.location : info.label}
                     </p>
                     {info.href ? (
                       <a
@@ -402,7 +403,7 @@ export default function Home() {
           <AnimatedSection delay={0.15}>
             <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white/60 px-6 py-5 backdrop-blur-sm sm:flex-row dark:border-slate-800 dark:bg-slate-900/40">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Terhubung juga di media sosial —
+                {t.contact.socialLine}
               </p>
               <SocialLinks className="gap-3" />
             </div>

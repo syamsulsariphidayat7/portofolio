@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "./ThemeToggle";
+import { LangToggle } from "./LangToggle";
+import { useLang, type Dict } from "@/lib/i18n";
 import { DecryptText } from "./DecryptText";
 import { personal } from "@/content/personal";
 
@@ -32,8 +34,17 @@ function useActiveSection(sections: string[]): string {
 
 const links = [
   {
+    href: "/#start",
+    labelKey: "home" as keyof Dict["nav"],
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+      </svg>
+    ),
+  },
+  {
     href: "/#work",
-    label: "Karya",
+    labelKey: "featured" as keyof Dict["nav"],
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18a2 2 0 01-.128 0 47.5 47.5 0 00-16.5 0A2.003 2.003 0 012 18.4V5.6a2 2 0 012-2h0a4.5 4.5 0 014.5 4.5v.75M20.25 14.15l-3.375-1.35M20.25 14.15l-2.625 1.05M20.25 14.15l1.875-.75a1.875 1.875 0 000-3.45L12 5.4a1.875 1.875 0 00-1.5 0L3.375 8.1a1.875 1.875 0 000 3.45L12 14.85" />
@@ -42,7 +53,7 @@ const links = [
   },
   {
     href: "/#about",
-    label: "Tentang",
+    labelKey: "about" as keyof Dict["nav"],
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -51,7 +62,7 @@ const links = [
   },
   {
     href: "/projects",
-    label: "Proyek",
+    labelKey: "projects" as keyof Dict["nav"],
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
@@ -60,7 +71,7 @@ const links = [
   },
   {
     href: "/#contact",
-    label: "Kontak",
+    labelKey: "contact" as keyof Dict["nav"],
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -69,23 +80,21 @@ const links = [
   },
 ];
 
-const sectionIds = ["work", "about", "contact"];
+const sectionIds = ["start", "work", "about", "contact"];
 
 export function Navbar() {
+  const { t } = useLang();
   const pathname = usePathname();
   const activeSection = useActiveSection(sectionIds);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
 
+  /* Nav selalu tampil. Dulu ada perilaku sembunyi saat scroll ke bawah
+     (muncul lagi saat scroll ke atas) — dicabut 22 Nov 2026 atas laporan
+     Syamsul "nav hilang saat scroll": selama showcase horizontal yang
+     ter-pin, halaman terus di-scroll sehingga nav praktis hilang terus.
+     Yang dipertahankan hanya perubahan latar saat sudah di-scroll. */
   useEffect(() => {
-    let lastY = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 16);
-      if (y > lastY && y > 140) setHidden(true);
-      else setHidden(false);
-      lastY = y;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -93,6 +102,7 @@ export function Navbar() {
 
   function isActive(href: string) {
     if (href === "/projects") return pathname === "/projects";
+    if (href === "/#start") return pathname === "/" && activeSection === "start";
     if (href === "/#work") return pathname === "/" && activeSection === "work";
     if (href === "/#about") return pathname === "/" && activeSection === "about";
     if (href === "/#contact") return pathname === "/" && activeSection === "contact";
@@ -103,15 +113,13 @@ export function Navbar() {
     <>
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-          hidden ? "-translate-y-full" : "translate-y-0"
-        } ${
           scrolled
             ? "border-b border-slate-200/70 bg-white/80 shadow-lg shadow-slate-900/5 backdrop-blur-xl dark:border-slate-800/70 dark:bg-slate-950/80 dark:shadow-black/20"
             : "border-b border-transparent bg-transparent"
         }`}
       >
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
-        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <nav className="mx-auto flex h-16 max-w-[90rem] items-center justify-between px-4 sm:px-6">
           <Link href="/" className="group flex items-center gap-2.5">
             <span className="relative grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-teal-500 text-lg font-bold text-white shadow-lg shadow-primary-500/25 transition-transform duration-300 group-hover:rotate-3 group-hover:scale-105">
               {personal.brand[0]}
@@ -144,7 +152,7 @@ export function Navbar() {
                   />
                 )}
                 <span className="relative z-10">
-                  <DecryptText text={isActive(link.href) ? `[ ${link.label} ]` : link.label} />
+                  <DecryptText text={isActive(link.href) ? `[ ${t.nav[link.labelKey]} ]` : t.nav[link.labelKey]} />
                 </span>
               </Link>
             ))}
@@ -159,6 +167,7 @@ export function Navbar() {
               </svg>
               CV
             </a>
+            <LangToggle />
             <ThemeToggle />
             <div aria-hidden="true" className="ml-1 flex h-3 items-end gap-0.5">
               {[8, 13, 6, 11, 9].map((h, i) => (
@@ -171,7 +180,8 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center gap-1 md:hidden">
+            <LangToggle />
             <ThemeToggle />
           </div>
         </nav>
@@ -190,7 +200,7 @@ export function Navbar() {
               }`}
             >
               {link.icon}
-              <span className="text-[10px] font-medium leading-tight">{link.label}</span>
+              <span className="text-[10px] font-medium leading-tight">{t.nav[link.labelKey]}</span>
               <span
                 className={`absolute -bottom-1 h-1 w-1 rounded-full bg-primary-500 transition-opacity ${
                   isActive(link.href) ? "opacity-100" : "opacity-0"

@@ -24,7 +24,7 @@ import {
   type Material,
 } from "three";
 
-const PARTICLE_COUNT = 700; /* dikurangi agar hero tidak terlalu rame */
+const PARTICLE_COUNT = 240; /* sedikit saja biar simple — dulu 700, terasa terlalu rame di hero */
 const MAX_DPR = 1.75;
 
 /**

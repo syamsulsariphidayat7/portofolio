@@ -108,7 +108,14 @@ function getReducedMotionSnapshot() {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-export function HeroTerminal({ className = "" }: { className?: string }) {
+export function HeroTerminal({
+  className = "",
+  size = "sm",
+}: {
+  className?: string;
+  size?: "sm" | "lg";
+}) {
+  const lg = size === "lg";
   const rootRef = useRef<HTMLDivElement>(null);
   const reduce = useSyncExternalStore(
     subscribeReducedMotion,
@@ -165,15 +172,15 @@ export function HeroTerminal({ className = "" }: { className?: string }) {
   return (
     <div ref={rootRef} aria-hidden="true" className={className}>
       {/* Chrome jendela */}
-      <div className="flex items-center gap-1.5 px-4 pb-0 pt-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-        <span className="ml-2 font-mono text-[10px] text-slate-400">developer.ts</span>
-        <span className="ml-auto font-mono text-[10px] text-primary-500/70">● REC</span>
+      <div className={lg ? "flex items-center gap-2 px-5 pb-0 pt-4" : "flex items-center gap-1.5 px-4 pb-0 pt-3"}>
+        <span className={`${lg ? "h-3 w-3" : "h-2.5 w-2.5"} rounded-full bg-red-400`} />
+        <span className={`${lg ? "h-3 w-3" : "h-2.5 w-2.5"} rounded-full bg-yellow-400`} />
+        <span className={`${lg ? "h-3 w-3" : "h-2.5 w-2.5"} rounded-full bg-emerald-400`} />
+        <span className={`ml-2 font-mono ${lg ? "text-[11px]" : "text-[10px]"} text-slate-400`}>developer.ts</span>
+        <span className={`ml-auto font-mono ${lg ? "text-[11px]" : "text-[10px]"} text-primary-500/70`}>● REC</span>
       </div>
 
-      <pre className="overflow-x-auto px-4 pb-4 pt-2 font-mono text-[11px] leading-relaxed">
+      <pre className={lg ? "min-h-[312px] overflow-x-auto px-5 pb-5 pt-3 font-mono text-[13px] leading-loose" : "overflow-x-auto px-4 pb-4 pt-2 font-mono text-[11px] leading-relaxed"}>
         <code>
           {SCRIPT.map((ln, i) => {
             if (!showAll && i > line) return null;
@@ -192,14 +199,14 @@ export function HeroTerminal({ className = "" }: { className?: string }) {
                   ) : null;
                 })}
                 {isCurrent && (
-                  <span className="animate-blink ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 bg-primary-500" />
+                  <span className={`animate-blink ml-0.5 inline-block ${lg ? "h-3.5 w-2" : "h-3 w-1.5"} translate-y-0.5 bg-primary-500`} />
                 )}
               </span>
             );
           })}
           {showAll && (
             <span className="block">
-              <span className="animate-blink ml-0.5 inline-block h-3 w-1.5 translate-y-0.5 bg-primary-500" />
+              <span className={`animate-blink ml-0.5 inline-block ${lg ? "h-3.5 w-2" : "h-3 w-1.5"} translate-y-0.5 bg-primary-500`} />
             </span>
           )}
         </code>
