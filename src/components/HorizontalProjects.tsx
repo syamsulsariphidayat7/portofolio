@@ -321,8 +321,11 @@ export function HorizontalProjects() {
           </a>
         </motion.div>
 
-        {/* Progress bar + index */}
-        <div className="absolute bottom-6 z-10 left-[6vw] right-[6vw] lg:left-[24vw]">
+        {/* Progress bar + index — wadah simetris kiri/kanan 6vw agar bar
+            benar-benar di tengah (dulu ada lg:left-[24vw] tanpa pasangan
+            kanan, jadi di layar besar bar geser ke kanan — dilaporkan
+            Syamsul 22 Nov 2026) */}
+        <div className="absolute bottom-6 z-10 left-[6vw] right-[6vw]">
           <div className="mx-auto flex max-w-3xl items-end justify-between font-mono text-[11px] tracking-[0.25em] text-slate-400">
             <span>
               SCROLL <span className="text-primary-500">▸</span>
